@@ -2,62 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Removed explicit body font-family to allow Inter from layout.tsx to take precedence */
+/*
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+*/
 
 @layer base {
   :root {
-    --background: 204 17% 95%; /* Light gray #ecf0f1 */
-    --foreground: 210 20% 20%; /* Dark Gray for text on light background */
+    /* Well-being Palette - Light Mode */
+    --background: 210 30% 98%; /* Very light, airy cool gray */
+    --foreground: 210 15% 30%; /* Soft, dark desaturated blue-gray for text */
 
-    --card: 0 0% 100%; /* White cards on light gray background */
-    --card-foreground: 210 20% 20%; /* Dark text on cards */
+    --card: 0 0% 100%; /* White cards (e.g., for Habit OKRs) */
+    --card-foreground: 210 15% 30%; /* Matches main foreground */
     
-    --life-okr-card-background: 207 70% 96%; /* Slightly more saturated light blue #F2F9FC */
-    --area-okr-card-background: 210 20% 97.5%; /* Very light neutral gray #F8F9FA */
-
+    /* Specific card backgrounds for OKR levels */
+    --life-okr-card-background: 170 50% 94%; /* Pale, soft aqua/teal - tranquility, gentle growth */
+    --area-okr-card-background: 50 35% 95%;  /* Pale, soft cream/light-yellow - clarity, focus */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 20% 20%;
+    --popover-foreground: 210 15% 30%;
 
-    --primary: 207 70% 53%; /* Blue #3498db */
-    --primary-foreground: 0 0% 100%; /* White text on blue */
+    --primary: 207 70% 53%; /* Calming Blue #3498db (Trust, Professionalism) - unchanged */
+    --primary-foreground: 0 0% 100%; /* White text on blue - unchanged */
 
-    --secondary: 204 17% 90%; /* Slightly darker gray for secondary elements */
-    --secondary-foreground: 210 20% 25%; /* Darker text for on secondary elements */
+    --secondary: 210 25% 93%; /* Slightly darker, soft cool gray */
+    --secondary-foreground: 210 15% 35%; /* Darker text for on secondary elements */
 
-    --muted: 204 17% 88%; /* Even lighter gray for muted elements */
-    --muted-foreground: 210 20% 40%; /* Muted text color */
+    --muted: 210 25% 90%; /* Lighter cool gray for muted elements */
+    --muted-foreground: 210 15% 50%; /* Muted text color */
 
-    --accent: 145 63% 49%; /* Green #2ecc71 */
-    --accent-foreground: 0 0% 100%; /* White text on green */
+    --accent: 145 63% 49%; /* Uplifting Green #2ecc71 (Success, Progress) - unchanged */
+    --accent-foreground: 0 0% 100%; /* White text on green - unchanged */
 
-    --destructive: 0 84.2% 60.2%; /* Default destructive (red) */
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%; /* Standard destructive (red) - unchanged */
+    --destructive-foreground: 0 0% 98%; /* Unchanged */
 
-    --border: 204 17% 85%; /* Border color based on secondary scheme */
-    --input: 204 17% 88%; /* Input background based on secondary scheme */
-    --ring: 207 70% 53%; /* Ring color to match primary blue */
+    --border: 210 20% 88%; /* Soft border color */
+    --input: 210 25% 94%; /* Soft input background */
+    --ring: 207 70% 53%; /* Ring color to match primary blue - unchanged */
     
-    --chart-1: 207 70% 53%; /* Primary Blue */
-    --chart-2: 145 63% 49%; /* Accent Green */
-    --chart-3: 207 70% 65%; /* Lighter Blue */
-    --chart-4: 145 63% 60%; /* Lighter Green */
-    --chart-5: 207 50% 50%; /* Muted Blue */
+    /* Chart colors for well-being: calming, optimistic, creative */
+    --chart-1: 207 70% 53%; /* Primary Blue (Calm) */
+    --chart-2: 145 63% 49%; /* Accent Green (Growth) */
+    --chart-3: 40 90% 60%;  /* Warm Yellow (Optimism, Happiness) */
+    --chart-4: 290 60% 70%; /* Soft Lavender (Creativity, Peace) */
+    --chart-5: 190 50% 65%; /* Muted Cyan/Teal (Tranquility) */
     
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* Unchanged */
 
-    /* Custom progress colors */
-    --success: 145 63% 49%; /* Green, same as accent for now */
+    /* Custom progress colors reflecting well-being */
+    --success: 145 63% 49%; /* Green, same as accent */
     --success-foreground: 0 0% 100%;
-    --warning: 45 90% 55%; /* Bright yellow/amber */
-    --warning-foreground: 210 20% 20%; /* Dark text on yellow */
+    --warning: 38 90% 58%; /* Warm, optimistic orange-yellow */
+    --warning-foreground: 25 15% 20%; /* Dark text on warning */
     --danger: 0 84.2% 60.2%; /* Red, same as destructive */
     --danger-foreground: 0 0% 98%;
 
-
-    /* Existing sidebar variables, kept for compatibility if shadcn/ui components use them */
+    /* Sidebar variables - kept as per existing structure, can be themed further if needed */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -69,53 +73,54 @@ body {
   }
 
   .dark {
-    --background: 210 15% 12%; /* Dark bluish-gray */
-    --foreground: 204 17% 95%; /* Light gray text */
+    /* Well-being Palette - Dark Mode */
+    --background: 210 15% 10%; /* Dark, calming blue-gray */
+    --foreground: 210 25% 92%; /* Light, soft cool gray text */
 
-    --card: 210 15% 18%; /* Slightly lighter dark for cards */
-    --card-foreground: 204 17% 95%;
+    --card: 210 15% 15%; /* Slightly lighter dark for cards */
+    --card-foreground: 210 25% 92%;
 
-    --life-okr-card-background: 207 70% 20%; /* Darker blue #254360 */
-    --area-okr-card-background: 210 15% 23%; /* Darker neutral gray #33373D */
+    --life-okr-card-background: 170 35% 18%; /* Dark, desaturated aqua/teal */
+    --area-okr-card-background: 50 20% 20%;  /* Dark, desaturated soft cream/beige */
 
+    --popover: 210 15% 15%;
+    --popover-foreground: 210 25% 92%;
 
-    --popover: 210 15% 18%;
-    --popover-foreground: 204 17% 95%;
+    --primary: 207 70% 53%; /* Blue #3498db - unchanged */
+    --primary-foreground: 0 0% 100%; /* White text on blue - unchanged */
 
-    --primary: 207 70% 53%; /* Blue #3498db */
-    --primary-foreground: 0 0% 100%; /* White text on blue */
+    --secondary: 210 15% 22%; /* Darker secondary elements */
+    --secondary-foreground: 210 25% 88%;
 
-    --secondary: 210 15% 25%; /* Darker secondary elements */
-    --secondary-foreground: 204 17% 90%;
+    --muted: 210 15% 20%;
+    --muted-foreground: 210 25% 70%;
 
-    --muted: 210 15% 22%;
-    --muted-foreground: 204 17% 70%;
+    --accent: 145 63% 49%; /* Green #2ecc71 - unchanged */
+    --accent-foreground: 0 0% 100%; /* Unchanged */
 
-    --accent: 145 63% 49%; /* Green #2ecc71 */
-    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%; /* Unchanged */
+    --destructive-foreground: 0 0% 98%; /* Unchanged */
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 210 15% 30%;
-    --input: 210 15% 28%;
-    --ring: 207 70% 53%;
+    --border: 210 15% 28%;
+    --input: 210 15% 25%;
+    --ring: 207 70% 53%; /* Unchanged */
     
-    --chart-1: 207 70% 53%; /* Primary Blue */
-    --chart-2: 145 63% 49%; /* Accent Green */
-    --chart-3: 207 70% 65%; /* Lighter Blue */
-    --chart-4: 145 63% 60%; /* Lighter Green */
-    --chart-5: 207 50% 50%; /* Muted Blue */
+    /* Chart colors for dark mode */
+    --chart-1: 207 70% 58%; /* Primary Blue (brighter for dark) */
+    --chart-2: 145 63% 54%; /* Accent Green (brighter for dark) */
+    --chart-3: 40 85% 65%;  /* Warm Yellow */
+    --chart-4: 290 55% 70%; /* Soft Lavender */
+    --chart-5: 190 45% 65%; /* Muted Cyan/Teal */
 
-    /* Custom progress colors */
-    --success: 145 63% 49%;
+    /* Custom progress colors for dark mode */
+    --success: 145 63% 52%;
     --success-foreground: 0 0% 100%;
-    --warning: 45 90% 50%;
-    --warning-foreground: 210 15% 85%; /* Lighter text on dark yellow */
-    --danger: 0 70% 50%;
+    --warning: 38 85% 60%;
+    --warning-foreground: 25 10% 15%; /* Darker text on warning for contrast */
+    --danger: 0 70% 55%;
     --danger-foreground: 0 0% 98%;
 
-    /* Existing sidebar variables for dark mode */
+    /* Sidebar variables for dark mode - kept as per existing */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
