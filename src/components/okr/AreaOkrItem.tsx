@@ -28,7 +28,6 @@ const getProgressColorStyle = (percentage: number) => {
 };
 
 export function AreaOkrItem({ areaOkr, lifeOkrId, onUpdateKeyResult, iconMap }: AreaOkrItemProps) {
-  const [isExpanded, setIsExpanded] = React.useState(true);
   const AreaOkrIconComponent = areaOkr.icon && iconMap[areaOkr.icon] ? iconMap[areaOkr.icon] : TargetIcon;
   
   let progressSum = 0;
@@ -42,13 +41,13 @@ export function AreaOkrItem({ areaOkr, lifeOkrId, onUpdateKeyResult, iconMap }: 
   const progressColorClass = getProgressColorStyle(overallProgress);
 
   return (
-    <div className="py-3 px-4 hover:bg-muted/20">
+    <div className="bg-areaOkrCard">
        <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
         <AccordionItem value="item-1" className="border-b-0">
-          <AccordionTrigger className="py-2 hover:no-underline">
+          <AccordionTrigger className="py-3 px-4 hover:no-underline hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
             <div className="flex items-center w-full">
               <AreaOkrIconComponent className={cn("h-5 w-5 mr-2.5 flex-shrink-0", 
-                areaOkr.icon && iconMap[areaOkr.icon] ? `text-secondary-foreground` : 'text-muted-foreground'
+                areaOkr.icon && iconMap[areaOkr.icon] ? `text-primary` : 'text-muted-foreground' // Adjusted icon color
               )} />
               <div className="flex-grow">
                 <h4 className="text-md font-medium text-foreground text-left">{areaOkr.title}</h4>
@@ -64,20 +63,19 @@ export function AreaOkrItem({ areaOkr, lifeOkrId, onUpdateKeyResult, iconMap }: 
               </div>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pt-1 pb-0">
+          <AccordionContent className="pb-0 px-0">
             {areaOkr.keyResults.length > 0 ? (
-              <div className="space-y-0 border-t border-border/30 mt-2 pt-1">
+              <div className="bg-card p-4 space-y-0 border-t border-border/30">
                 {areaOkr.keyResults.map(kr => (
                   <KeyResultDisplay 
                     key={kr.id} 
                     keyResult={kr}
                     // onUpdate={(newCurrentValue) => onUpdateKeyResult(lifeOkrId, areaOkr.id, kr.id, newCurrentValue)}
-                    // ^ If direct KR editing from display is needed in future
                   />
                 ))}
               </div>
             ) : (
-              <p className="px-2 py-3 text-xs text-muted-foreground">No Habit OKRs (Key Results) for this Area OKR yet.</p>
+              <p className="px-4 py-3 text-xs text-muted-foreground bg-card border-t border-border/30">No Habit OKRs (Key Results) for this Area OKR yet.</p>
             )}
           </AccordionContent>
         </AccordionItem>

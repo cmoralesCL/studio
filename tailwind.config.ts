@@ -17,6 +17,7 @@ export default {
   				foreground: 'hsl(var(--card-foreground))'
   			},
         lifeOkrCard: 'hsl(var(--life-okr-card-background))',
+        areaOkrCard: 'hsl(var(--area-okr-card-background))',
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
   				foreground: 'hsl(var(--popover-foreground))'

@@ -67,7 +67,7 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
   return (
     <Card className="w-full shadow-lg bg-lifeOkrCard rounded-lg border border-border/70">
       <CardHeader 
-        className="p-4 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-lg" 
+        className="p-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-t-lg" 
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex justify-between items-center">
@@ -116,7 +116,7 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
       {isExpanded && (
         <CardContent className="p-0">
           {lifeOkr.areaOkrs.length > 0 ? (
-            <div className="divide-y divide-border/50 border-t border-border/50">
+            <div className="divide-y divide-border/50">
               {lifeOkr.areaOkrs.map(areaOkr => (
                 <AreaOkrItem 
                   key={areaOkr.id}
