@@ -24,17 +24,7 @@ import {
 const generateId = () => crypto.randomUUID();
 
 const exampleObjectives: Objective[] = [
-  {
-    id: generateId(),
-    title: "Mejorar mi bienestar físico y mental",
-    description: "Objetivos enfocados en la salud personal.",
-    level: "Personal",
-    keyResults: [
-      { id: generateId(), title: "Hacer ejercicio al menos 3 veces por semana", currentValue: 0, targetValue: 3, unit: "veces/semana" },
-      { id: generateId(), title: "Meditar durante 10 minutos diarios", currentValue: 0, targetValue: 10, unit: "minutos/día" },
-      { id: generateId(), title: "Leer al menos un libro al mes sobre desarrollo personal", currentValue: 0, targetValue: 1, unit: "libro/mes" },
-    ],
-  },
+  // Okr de Vida
   {
     id: generateId(),
     title: "Fortalecer mis relaciones personales",
@@ -44,28 +34,6 @@ const exampleObjectives: Objective[] = [
       { id: generateId(), title: "Tener una conversación significativa con un miembro de mi familia cada semana", currentValue: 0, targetValue: 1, unit: "conversación/semana" },
       { id: generateId(), title: "Salir con amigos o seres queridos al menos dos veces al mes", currentValue: 0, targetValue: 2, unit: "veces/mes" },
       { id: generateId(), title: "Dedicar tiempo a escuchar y apoyar a mis amigos y familiares", currentValue: 0, targetValue: 5, unit: "interacciones/mes" },
-    ],
-  },
-  {
-    id: generateId(),
-    title: "Mejorar mi desempeño profesional y avanzar en mi carrera",
-    description: "Objetivos relacionados con el crecimiento laboral.",
-    level: "Team", // Could be 'Individual' or 'Team' depending on context
-    keyResults: [
-      { id: generateId(), title: "Completar un curso o certificación relevante en los próximos tres meses", currentValue: 0, targetValue: 1, unit: "curso" },
-      { id: generateId(), title: "Liderar o participar activamente en un proyecto clave", currentValue: 0, targetValue: 1, unit: "proyecto" },
-      { id: generateId(), title: "Recibir comentarios positivos de superiores y compañeros", currentValue: 0, targetValue: 3, unit: "feedbacks" },
-    ],
-  },
-  {
-    id: generateId(),
-    title: "Aumentar mi productividad y eficiencia en el trabajo",
-    description: "Objetivos para optimizar el rendimiento laboral.",
-    level: "Individual",
-    keyResults: [
-      { id: generateId(), title: "Implementar un sistema de gestión del tiempo (Pomodoro) y usarlo diariamente", currentValue: 0, targetValue: 1, unit: "sistema implementado" },
-      { id: generateId(), title: "Reducir el tiempo dedicado a tareas no esenciales en un 20%", currentValue: 0, targetValue: 20, unit: "%" },
-      { id: generateId(), title: "Completar todas mis tareas prioritarias antes de finalizar cada día laboral", currentValue: 0, targetValue: 5, unit: "días/semana" },
     ],
   },
   {
@@ -90,6 +58,41 @@ const exampleObjectives: Objective[] = [
       { id: generateId(), title: "Participar en actividades cívicas o políticas para promover el cambio social", currentValue: 0, targetValue: 2, unit: "actividades/año" },
     ],
   },
+  // Okr de Área (Laboral/Profesional)
+  {
+    id: generateId(),
+    title: "Mejorar mi desempeño profesional y avanzar en mi carrera",
+    description: "Objetivos relacionados con el crecimiento laboral.",
+    level: "Team", // Could be 'Individual' or 'Team' depending on context
+    keyResults: [
+      { id: generateId(), title: "Completar un curso o certificación relevante en los próximos tres meses", currentValue: 0, targetValue: 1, unit: "curso" },
+      { id: generateId(), title: "Liderar o participar activamente en un proyecto clave", currentValue: 0, targetValue: 1, unit: "proyecto" },
+      { id: generateId(), title: "Recibir comentarios positivos de superiores y compañeros", currentValue: 0, targetValue: 3, unit: "feedbacks" },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Aumentar mi productividad y eficiencia en el trabajo",
+    description: "Objetivos para optimizar el rendimiento laboral.",
+    level: "Individual",
+    keyResults: [
+      { id: generateId(), title: "Implementar un sistema de gestión del tiempo (Pomodoro) y usarlo diariamente", currentValue: 0, targetValue: 1, unit: "sistema implementado" },
+      { id: generateId(), title: "Reducir el tiempo dedicado a tareas no esenciales en un 20%", currentValue: 0, targetValue: 20, unit: "%" },
+      { id: generateId(), title: "Completar todas mis tareas prioritarias antes de finalizar cada día laboral", currentValue: 0, targetValue: 5, unit: "días/semana" },
+    ],
+  },
+  // Okr de Hábito
+  {
+    id: generateId(),
+    title: "Mejorar mi bienestar físico y mental",
+    description: "Objetivos enfocados en la salud personal.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Hacer ejercicio al menos 3 veces por semana", currentValue: 0, targetValue: 3, unit: "veces/semana" },
+      { id: generateId(), title: "Meditar durante 10 minutos diarios", currentValue: 0, targetValue: 10, unit: "minutos/día" },
+      { id: generateId(), title: "Leer al menos un libro al mes sobre desarrollo personal", currentValue: 0, targetValue: 1, unit: "libro/mes" },
+    ],
+  },
 ];
 
 
@@ -109,7 +112,15 @@ export default function OkrTrackerPage() {
     const storedObjectives = localStorage.getItem('okrObjectives');
     if (storedObjectives && storedObjectives !== '[]') {
       try {
-        setObjectives(JSON.parse(storedObjectives));
+        const parsedObjectives = JSON.parse(storedObjectives);
+        // Basic validation to ensure it's an array of objectives
+        if (Array.isArray(parsedObjectives) && parsedObjectives.every(obj => obj.id && obj.title && Array.isArray(obj.keyResults))) {
+            setObjectives(parsedObjectives);
+        } else {
+            console.warn("Stored objectives are not in the expected format. Loading example objectives.");
+            localStorage.removeItem('okrObjectives');
+            setObjectives(exampleObjectives);
+        }
       } catch (error) {
         console.error("Failed to parse objectives from localStorage", error);
         localStorage.removeItem('okrObjectives'); // Clear corrupted data
@@ -122,7 +133,7 @@ export default function OkrTrackerPage() {
   }, []);
 
   useEffect(() => {
-    if(isClient) { // Only run on client after initial mount
+    if(isClient && objectives.length > 0) { // Only run on client after initial mount and if objectives exist
         localStorage.setItem('okrObjectives', JSON.stringify(objectives));
     }
   }, [objectives, isClient]);
@@ -267,4 +278,3 @@ export default function OkrTrackerPage() {
     </div>
   );
 }
-
