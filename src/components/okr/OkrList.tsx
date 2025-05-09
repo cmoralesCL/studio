@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -5,6 +6,7 @@ import type { Objective } from '@/lib/types';
 import { OkrCard } from './OkrCard';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Activity, Award, Briefcase, FolderArchive, Landmark, Users } from 'lucide-react';
 
 interface OkrListProps {
   objectives: Objective[];
@@ -20,6 +22,25 @@ const getLifeOkrCategory = (description?: string): string => {
     return match[1].trim();
   }
   return "Otros Objetivos"; // Default if pattern not found
+};
+
+const getLifeOkrCategoryIcon = (category: string): React.ReactNode => {
+  const iconProps = { className: "h-6 w-6 mr-3 text-primary" };
+  switch (category) {
+    case "Bienestar Físico y Mental":
+      return <Activity {...iconProps} />;
+    case "Desarrollo Profesional y Carrera":
+      return <Briefcase {...iconProps} />;
+    case "Finanzas Personales":
+      return <Landmark {...iconProps} />;
+    case "Relaciones Interpersonales":
+      return <Users {...iconProps} />;
+    case "Crecimiento Personal y Contribución":
+      return <Award {...iconProps} />;
+    case "Otros Objetivos":
+    default:
+      return <FolderArchive {...iconProps} />;
+  }
 };
 
 const calculateAreaOkrProgress = (objective: Objective): number => {
@@ -87,7 +108,10 @@ export function OkrList({ objectives, onUpdateKeyResult, onDeleteObjective, onEd
         return (
           <Card key={category} className="overflow-hidden shadow-xl">
             <CardHeader className="bg-primary/10 dark:bg-primary/20">
-              <CardTitle className="text-2xl font-bold text-primary">{category}</CardTitle>
+              <CardTitle className="text-2xl font-bold text-primary flex items-center">
+                {getLifeOkrCategoryIcon(category)}
+                {category}
+              </CardTitle>
               <div className="mt-2">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sm font-medium text-foreground">Progreso General del Ámbito</span>

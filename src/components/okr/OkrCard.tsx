@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -8,7 +9,7 @@ import { KeyResultDisplay } from './KeyResultDisplay';
 import { OkrProgressChart } from './OkrProgressChart';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, EyeOff, Eye } from 'lucide-react';
+import { Trash2, Edit, EyeOff, Eye, Target } from 'lucide-react';
 
 interface OkrCardProps {
   objective: Objective;
@@ -34,7 +35,10 @@ export function OkrCard({ objective, onUpdateKeyResult, onDeleteObjective, onEdi
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-2xl font-semibold text-primary">{objective.title}</CardTitle>
+            <CardTitle className="text-2xl font-semibold text-primary flex items-center">
+              <Target className="h-6 w-6 mr-3 text-primary" />
+              {objective.title}
+            </CardTitle>
             <Badge variant="outline" className="mt-1">{objective.level}</Badge>
           </div>
           <div className="flex space-x-2">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -6,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Check, Edit3, Save, X, CalendarClock, AlertTriangle, CalendarDays } from 'lucide-react';
+import { Check, Edit3, Save, X, CalendarClock, AlertTriangle, CalendarDays, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -71,7 +72,10 @@ export function KeyResultDisplay({ keyResult, onUpdateKeyResult, objectiveId }: 
     <TooltipProvider>
       <div className="p-4 border rounded-lg shadow-sm bg-background hover:shadow-md transition-shadow duration-200 space-y-3">
         <div className="flex justify-between items-start">
-          <h4 className="font-semibold text-md text-foreground flex-1">{keyResult.title}</h4>
+          <h4 className="font-semibold text-md text-foreground flex-1 flex items-center">
+            <ListChecks className="h-4 w-4 mr-2 text-foreground/80" />
+            {keyResult.title}
+          </h4>
           <div className="flex items-center space-x-1">
             {isOverdue && (
               <Tooltip>
