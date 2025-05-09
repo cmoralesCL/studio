@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { addDays, endOfYear, formatISO } from 'date-fns';
+import { addDays, endOfYear, formatISO, endOfMonth, endOfQuarter } from 'date-fns';
 
 // Helper to generate unique IDs
 const generateId = () => crypto.randomUUID();
@@ -28,92 +28,195 @@ const getCurrentISODate = () => new Date().toISOString();
 const getNextWeekendDateISO = () => {
   const today = new Date();
   const dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
-  // Target next Sunday. If today is Sunday, target next Sunday.
   const daysUntilSunday = dayOfWeek === 0 ? 7 : (7 - dayOfWeek);
   const nextSunday = new Date(today);
   nextSunday.setDate(today.getDate() + daysUntilSunday);
   nextSunday.setHours(23, 59, 59, 999);
   return nextSunday.toISOString();
-}
+};
 
-const getEndOfQuarterDateISO = () => {
-    const today = new Date();
-    const currentQuarter = Math.floor((today.getMonth() / 3));
-    const firstDayOfNextQuarter = new Date(today.getFullYear(), currentQuarter * 3 + 3, 1);
-    const lastDayOfCurrentQuarter = new Date(firstDayOfNextQuarter.setDate(0)); // Set to last day of previous month
-    lastDayOfCurrentQuarter.setHours(23,59,59,999);
-    return lastDayOfCurrentQuarter.toISOString();
-}
+const getEndOfCurrentMonthISO = () => {
+    return endOfMonth(new Date()).toISOString();
+};
+
+const getEndOfCurrentQuarterISO = () => {
+    return endOfQuarter(new Date()).toISOString();
+};
 
 
 const exampleObjectives: Objective[] = [
-  // Okr de Vida
+  // Ámbito de Vida 1: Bienestar Físico y Mental
   {
     id: generateId(),
-    title: "Fortalecer mis relaciones personales",
-    description: "Objetivos para mejorar conexiones con otros.",
+    title: "Optimizar mi salud física",
+    description: "Ámbito de Vida: Bienestar Físico y Mental. Este objetivo se enfoca en mejorar la salud física general.",
     level: "Personal",
     keyResults: [
-      { id: generateId(), title: "Tener una conversación significativa con un miembro de mi familia cada semana", currentValue: 0, targetValue: 1, unit: "conversación/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
-      { id: generateId(), title: "Salir con amigos o seres queridos al menos dos veces al mes", currentValue: 0, targetValue: 2, unit: "veces/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() }, // No specific single date, recurring
-      { id: generateId(), title: "Dedicar tiempo a escuchar y apoyar a mis amigos y familiares", currentValue: 0, targetValue: 5, unit: "interacciones/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Realizar 150 minutos de ejercicio moderado por semana", currentValue: 0, targetValue: 150, unit: "minutos", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Consumir 5 porciones de frutas/verduras al día, alcanzando 30 porciones semanales", currentValue: 0, targetValue: 30, unit: "porciones/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Dormir un promedio de 7 horas por noche durante el trimestre", currentValue: 0, targetValue: 7, unit: "horas/noche (promedio)", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
     ],
   },
   {
     id: generateId(),
-    title: "Experimentar nuevas culturas",
-    description: "Objetivos para expandir horizontes y aprender sobre el mundo.",
+    title: "Mejorar mi salud mental y manejo del estrés",
+    description: "Ámbito de Vida: Bienestar Físico y Mental. Este objetivo busca fomentar la paz interior y reducir el estrés cotidiano.",
     level: "Personal",
     keyResults: [
-      { id: generateId(), title: "Planear un viaje a un país que no conozca este año", currentValue: 0, targetValue: 1, unit: "viaje planeado", trackingFrequency: "annually", lastUpdated: getCurrentISODate(), targetDate: endOfYear(new Date()).toISOString() },
-      { id: generateId(), title: "Leer al menos 3 libros sobre diferentes culturas y tradiciones", currentValue: 0, targetValue: 3, unit: "libros", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 90).toISOString() }, // Target in 3 months
-      { id: generateId(), title: "Probar la cocina de diferentes países al menos una vez al mes", currentValue: 0, targetValue: 1, unit: "cocina nueva/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Practicar meditación o mindfulness durante 10 minutos, 5 días a la semana", currentValue: 0, targetValue: 5, unit: "sesiones/semana", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Dedicar 3 horas a la semana a hobbies desestresantes (lectura, música, arte)", currentValue: 0, targetValue: 3, unit: "horas/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Limitar el consumo de noticias negativas a 30 minutos al día", currentValue: 0, targetValue: 30, unit: "minutos/día (máximo)", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
     ],
   },
   {
     id: generateId(),
-    title: "Contribuir activamente a mi comunidad y generar un impacto positivo",
-    description: "Objetivos para involucrarse y ayudar a otros.",
+    title: "Establecer una rutina de sueño consistente y reparadora",
+    description: "Ámbito de Vida: Bienestar Físico y Mental. Enfocado en mejorar la calidad y regularidad del descanso.",
     level: "Personal",
     keyResults: [
-      { id: generateId(), title: "Ser voluntario en una organización benéfica al menos una vez al mes", currentValue: 0, targetValue: 1, unit: "voluntariado/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Donar un porcentaje de mis ingresos a causas que me importan trimestralmente", currentValue: 0, targetValue: 1, unit: "donación/trimestre", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: getEndOfQuarterDateISO() },
-      { id: generateId(), title: "Participar en actividades cívicas o políticas para promover el cambio social", currentValue: 0, targetValue: 2, unit: "actividades/año", trackingFrequency: "annually", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Acostarme antes de las 11 PM y levantarme antes de las 7 AM, 5 noches por semana", currentValue: 0, targetValue: 5, unit: "noches/semana", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Evitar el uso de pantallas (teléfono, TV, computador) 1 hora antes de dormir", currentValue: 0, targetValue: 7, unit: "días/semana", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO()},
+      { id: generateId(), title: "Mantener el dormitorio oscuro, silencioso y fresco consistentemente", currentValue: 0, targetValue: 1, unit: "ambiente optimizado (0 o 1)", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
     ],
   },
-  // Okr de Área (Laboral/Profesional)
+
+  // Ámbito de Vida 2: Desarrollo Profesional y Carrera
   {
     id: generateId(),
-    title: "Mejorar mi desempeño profesional y avanzar en mi carrera",
-    description: "Objetivos relacionados con el crecimiento laboral.",
-    level: "Team", 
-    keyResults: [
-      { id: generateId(), title: "Completar un curso o certificación relevante en los próximos tres meses", currentValue: 0, targetValue: 1, unit: "curso", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 90).toISOString() },
-      { id: generateId(), title: "Liderar o participar activamente en un proyecto clave", currentValue: 0, targetValue: 1, unit: "proyecto", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 60).toISOString() },
-      { id: generateId(), title: "Recibir comentarios positivos de superiores y compañeros", currentValue: 0, targetValue: 3, unit: "feedbacks", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate() },
-    ],
-  },
-  {
-    id: generateId(),
-    title: "Aumentar mi productividad y eficiencia en el trabajo",
-    description: "Objetivos para optimizar el rendimiento laboral.",
-    level: "Individual",
-    keyResults: [
-      { id: generateId(), title: "Implementar un sistema de gestión del tiempo (Pomodoro) y usarlo diariamente", currentValue: 0, targetValue: 1, unit: "sistema implementado", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 7).toISOString() },
-      { id: generateId(), title: "Reducir el tiempo dedicado a tareas no esenciales en un 20%", currentValue: 0, targetValue: 20, unit: "%", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Completar todas mis tareas prioritarias antes de finalizar cada día laboral (objetivo: 5 días/semana)", currentValue: 0, targetValue: 5, unit: "días/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate() },
-    ],
-  },
-  // Okr de Hábito
-  {
-    id: generateId(),
-    title: "Mejorar mi bienestar físico y mental",
-    description: "Objetivos enfocados en la salud personal.",
+    title: "Adquirir una nueva habilidad técnica clave para mi industria",
+    description: "Ámbito de Vida: Desarrollo Profesional y Carrera. Centrado en el aprendizaje de competencias valoradas en el mercado laboral.",
     level: "Personal",
     keyResults: [
-      { id: generateId(), title: "Hacer ejercicio al menos 3 veces por semana", currentValue: 0, targetValue: 3, unit: "veces/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Meditar durante 10 minutos diarios (objetivo: 7 días/semana)", currentValue: 0, targetValue: 7, unit: "días/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
-      { id: generateId(), title: "Leer al menos un libro al mes sobre desarrollo personal", currentValue: 0, targetValue: 1, unit: "libro/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Completar un curso online avanzado de 'Inteligencia Artificial Aplicada' en 3 meses", currentValue: 0, targetValue: 100, unit: "% completado", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 90).toISOString() },
+      { id: generateId(), title: "Dedicar 8 horas semanales al estudio y práctica de la nueva habilidad", currentValue: 0, targetValue: 8, unit: "horas/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Aplicar la nueva habilidad en un proyecto personal o laboral demostrable antes de fin de trimestre", currentValue: 0, targetValue: 1, unit: "proyecto completado", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Aumentar mi visibilidad y red de contactos en mi sector",
+    description: "Ámbito de Vida: Desarrollo Profesional y Carrera. Busca expandir conexiones profesionales y reconocimiento.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Participar activamente (comentar/publicar) en 2 grupos profesionales online (LinkedIn, etc.) semanalmente", currentValue: 0, targetValue: 2, unit: "grupos/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Asistir a 2 eventos (virtuales o presenciales) de la industria este trimestre", currentValue: 0, targetValue: 2, unit: "eventos", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+      { id: generateId(), title: "Realizar 3 cafés virtuales informativos con profesionales de interés al mes", currentValue: 0, targetValue: 3, unit: "cafés/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Mejorar mi desempeño y contribución en mi rol actual",
+    description: "Ámbito de Vida: Desarrollo Profesional y Carrera. Enfocado en la excelencia y el impacto en el trabajo.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Incrementar la eficiencia en mis tareas principales en un 15% (medido por tiempo/resultados)", currentValue: 0, targetValue: 15, unit: "% mejora", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+      { id: generateId(), title: "Recibir una calificación de 'Supera las expectativas' en la próxima revisión de desempeño", currentValue: 0, targetValue: 1, unit: "evaluación positiva (0 o 1)", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: endOfYear(new Date()).toISOString() },
+      { id: generateId(), title: "Proponer e implementar 1 mejora de proceso significativa en mi equipo este trimestre", currentValue: 0, targetValue: 1, unit: "mejora implementada", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+    ],
+  },
+
+  // Ámbito de Vida 3: Finanzas Personales
+  {
+    id: generateId(),
+    title: "Incrementar mis ahorros e inversiones de forma sostenible",
+    description: "Ámbito de Vida: Finanzas Personales. Objetivo para mejorar la salud financiera a largo plazo.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Ahorrar el 20% de mis ingresos netos mensuales consistentemente", currentValue: 0, targetValue: 20, unit: "% mensual", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Aumentar mi cartera de inversión en un 10% este año (excluyendo nuevos aportes)", currentValue: 0, targetValue: 10, unit: "% crecimiento anual", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: endOfYear(new Date()).toISOString() },
+      { id: generateId(), title: "Establecer un fondo de emergencia equivalente a 3 meses de gastos fijos", currentValue: 0, targetValue: 3, unit: "meses de gastos", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 180).toISOString() }, // 6 meses para lograrlo
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Reducir deudas de consumo y optimizar gastos",
+    description: "Ámbito de Vida: Finanzas Personales. Busca aliviar la carga financiera y mejorar el flujo de efectivo.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Disminuir el saldo total de tarjetas de crédito en un 25% en los próximos 6 meses", currentValue: 0, targetValue: 25, unit: "% reducción", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 180).toISOString() },
+      { id: generateId(), title: "Reducir mis gastos discrecionales (no esenciales) en un 15% mensual", currentValue: 0, targetValue: 15, unit: "% reducción mensual", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "No incurrir en nuevas deudas de consumo (préstamos personales, compras a crédito no planificadas) durante el trimestre", currentValue: 0, targetValue: 0, unit: "nuevas deudas", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Mejorar mi educación y planificación financiera",
+    description: "Ámbito de Vida: Finanzas Personales. Enfocado en tomar decisiones financieras más informadas.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Leer 1 libro sobre finanzas personales o inversión al mes", currentValue: 0, targetValue: 3, unit: "libros/trimestre", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+      { id: generateId(), title: "Dedicar 2 horas semanales a investigar y aprender sobre estrategias de inversión y planificación", currentValue: 0, targetValue: 2, unit: "horas/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Crear y revisar un presupuesto detallado mensualmente", currentValue: 0, targetValue: 1, unit: "presupuesto revisado/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+    ],
+  },
+  
+  // Ámbito de Vida 4: Relaciones Interpersonales
+  {
+    id: generateId(),
+    title: "Fortalecer la relación con mi pareja",
+    description: "Ámbito de Vida: Relaciones Interpersonales. Dedicado a nutrir la conexión y complicidad en la pareja.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Tener 1 cita de calidad (sin distracciones, tiempo dedicado) con mi pareja cada semana", currentValue: 0, targetValue: 4, unit: "citas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Expresar aprecio o gratitud específica a mi pareja diariamente (mínimo 5 veces/semana)", currentValue: 0, targetValue: 5, unit: "expresiones/semana", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Planificar y realizar 1 escapada o actividad especial juntos este trimestre", currentValue: 0, targetValue: 1, unit: "actividad especial", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Cultivar y mantener amistades significativas",
+    description: "Ámbito de Vida: Relaciones Interpersonales. Enfocado en la calidad y constancia de los lazos de amistad.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Contactar proactivamente (llamada, mensaje extenso) a 2 amigos diferentes cada semana para conversar", currentValue: 0, targetValue: 2, unit: "contactos/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Organizar o participar en 1 actividad social con amigos (presencial o virtual) al mes", currentValue: 0, targetValue: 1, unit: "actividad/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Ofrecer apoyo activamente (escucha, ayuda) a un amigo que lo necesite al menos una vez al mes", currentValue: 0, targetValue: 1, unit: "acto de apoyo/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Mejorar la comunicación y conexión con mi familia (origen/extendida)",
+    description: "Ámbito de Vida: Relaciones Interpersonales. Busca fortalecer los vínculos familiares.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Realizar una videollamada o visita significativa a mis padres/hermanos cada 2 semanas", currentValue: 0, targetValue: 2, unit: "conexiones/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() }, // Bi-semanal = 2 al mes
+      { id: generateId(), title: "Practicar la escucha activa y validación emocional en el 80% de las conversaciones familiares importantes", currentValue: 0, targetValue: 80, unit: "% de conversaciones", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Recordar y celebrar activamente (mensaje, llamada, detalle) los cumpleaños y fechas importantes de 5 familiares cercanos", currentValue: 0, targetValue: 5, unit: "celebraciones/año", trackingFrequency: "annually", lastUpdated: getCurrentISODate(), targetDate: endOfYear(new Date()).toISOString() },
+    ],
+  },
+
+  // Ámbito de Vida 5: Crecimiento Personal y Contribución
+  {
+    id: generateId(),
+    title: "Desarrollar una nueva afición o pasatiempo enriquecedor",
+    description: "Ámbito de Vida: Crecimiento Personal y Contribución. Fomenta la exploración de nuevos intereses.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Dedicar 3 horas a la semana a aprender y practicar [Nueva Afición, ej: fotografía]", currentValue: 0, targetValue: 3, unit: "horas/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Unirme a un club o comunidad (online/offline) relacionada con la nueva afición este mes", currentValue: 0, targetValue: 1, unit: "comunidad unida", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Completar un proyecto básico o alcanzar un hito inicial (ej: tomar 50 fotos editadas) en la afición en 3 meses", currentValue: 0, targetValue: 1, unit: "proyecto/hito", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 90).toISOString() },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Contribuir a una causa social o comunitaria de mi interés",
+    description: "Ámbito de Vida: Crecimiento Personal y Contribución. Busca generar un impacto positivo más allá de uno mismo.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Realizar 10 horas de voluntariado al mes en [Organización/Causa Específica]", currentValue: 0, targetValue: 10, unit: "horas/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Donar un 2% de mis ingresos mensuales a [Organización Benéfica Seleccionada]", currentValue: 0, targetValue: 2, unit: "% mensual", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Participar activamente en 1 iniciativa de concienciación o recaudación de fondos para [Causa Específica] este semestre", currentValue: 0, targetValue: 1, unit: "iniciativa", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 180).toISOString() },
+    ],
+  },
+  {
+    id: generateId(),
+    title: "Expandir mis conocimientos generales y perspectiva del mundo",
+    description: "Ámbito de Vida: Crecimiento Personal y Contribución. Fomenta la curiosidad intelectual y la comprensión.",
+    level: "Personal",
+    keyResults: [
+      { id: generateId(), title: "Leer 1 libro de no ficción sobre un tema nuevo (historia, ciencia, filosofía) cada mes", currentValue: 0, targetValue: 3, unit: "libros/trimestre", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO() },
+      { id: generateId(), title: "Ver 2 documentales educativos o culturales de calidad por semana", currentValue: 0, targetValue: 8, unit: "documentales/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO() },
+      { id: generateId(), title: "Aprender y comprender 3 nuevos conceptos o hechos interesantes cada semana y ser capaz de explicarlos", currentValue: 0, targetValue: 3, unit: "conceptos/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
     ],
   },
 ];
@@ -312,3 +415,4 @@ export default function OkrTrackerPage() {
     </div>
   );
 }
+
