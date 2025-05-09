@@ -1,40 +1,34 @@
 export type TrackingFrequency = 'once' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annually';
 
-export interface KeyResult {
+// Expanded icon set for more variety
+export type OkrIcon = 
+  | 'Heart'       // General well-being, relationships
+  | 'Zap'         // Energy, new initiatives, innovation
+  | 'Target'      // General goals, precision
+  | 'Briefcase'   // Career, professional development
+  | 'Activity'    // Physical health, exercise
+  | 'Landmark'    // Finance, stability, major life goals
+  | 'Users'       // Social, community, teamwork
+  | 'Award'       // Achievements, skills, recognition
+  | 'FolderArchive' // Organization, knowledge management
+  | 'Smile'       // Mental health, happiness
+  | 'BookOpen'    // Learning, education
+  | 'DollarSign'  // Specific to finance
+  | 'Home'        // Home life, personal projects
+  | 'Brain'       // Mental acuity, learning new skills
+  | 'TrendingUp'  // Growth, improvement
+  | 'ShieldCheck'; // Security, safety
+
+
+export interface KeyResult { // Represents a Habit OKR
   id: string;
   title: string;
   currentValue: number;
   targetValue: number;
-  unit: string; // e.g., '%', 'USD', 'tasks'
-  trackingFrequency: TrackingFrequency;
-  lastUpdated: string; // ISO date string
-  targetDate?: string; // Optional: Specific deadline for the KR or current cycle
-  tags?: string[]; // For displaying tags like "Product", "Marketing"
-  subTasks?: { // For displaying progress like "2/5"
-    completed: number;
-    total: number;
-  };
-  assignees?: string[]; // Array of image URLs for assignees
-}
-
-export type ObjectiveLevel = 'Company' | 'Team' | 'Individual' | 'Personal';
-
-export interface Objective {
-  id: string;
-  title: string;
-  description?: string;
-  level: ObjectiveLevel;
-  keyResults: KeyResult[];
-  icon?: 'Heart' | 'Zap' | 'Target' | 'Briefcase' | 'Activity' | 'Landmark' | 'Users' | 'Award' | 'FolderArchive'; // For objective icon
-}
-
-// For form handling, especially before an ID is generated
-export interface KeyResultFormData {
-  title: string;
-  targetValue: number;
   unit: string;
   trackingFrequency: TrackingFrequency;
-  targetDate?: string; // Optional
+  lastUpdated: string; // ISO date string
+  targetDate?: string;
   tags?: string[];
   subTasks?: {
     completed: number;
@@ -43,21 +37,62 @@ export interface KeyResultFormData {
   assignees?: string[];
 }
 
-export interface ObjectiveFormData {
-  title:string;
+export type AreaOkrLevel = 'Company' | 'Team' | 'Individual' | 'Personal';
+
+export interface AreaOkr {
+  id: string;
+  title: string;
   description?: string;
-  level: ObjectiveLevel;
-  keyResults: KeyResultFormData[];
-  icon?: 'Heart' | 'Zap' | 'Target' | 'Briefcase' | 'Activity' | 'Landmark' | 'Users' | 'Award' | 'FolderArchive';
+  level: AreaOkrLevel;
+  icon?: OkrIcon;
+  keyResults: KeyResult[]; // List of Habit OKRs
 }
 
-// For the top summary cards
+export interface LifeOkr { // Represents a Life OKR (top-level)
+  id: string;
+  title: string;
+  description?: string;
+  icon?: OkrIcon; // Icon for the Life OKR category
+  areaOkrs: AreaOkr[]; // List of Area OKRs
+}
+
+// Form Data Types
+export interface KeyResultFormData {
+  title: string;
+  targetValue: number;
+  unit: string;
+  trackingFrequency: TrackingFrequency;
+  targetDate?: string;
+  tags?: string[]; // Will be string in form, transformed to array
+  assignees?: string[]; // Will be string in form, transformed to array
+  subTasks?: { // In form, these will be separate fields: subTasksCompleted, subTasksTotal
+    completed: number;
+    total: number;
+  };
+}
+
+export interface AreaOkrFormData {
+  title: string;
+  description?: string;
+  level: AreaOkrLevel;
+  icon?: OkrIcon;
+  keyResults: KeyResultFormData[];
+}
+
+export interface LifeOkrFormData { // Was ObjectiveFormData
+  title: string;
+  description?: string;
+  icon?: OkrIcon;
+  areaOkrs: AreaOkrFormData[];
+}
+
+
 export interface SummaryCardData {
   id: string;
-  title: string; // e.g., "NCS", "Overall Progress", "Tasks Done", "Days Left"
-  value: string | number; // The main value displayed, e.g., 40, "60%", "3/12", 12
-  unit?: string; // e.g., "NCS", "%", "days left"
-  progress?: number; // For circular progress, 0-100
-  variant: 'default' | 'primary' | 'accent' | 'warning' | 'destructive'; // To color the progress or text
+  title: string;
+  value: string | number;
+  unit?: string;
+  progress?: number;
+  variant: 'default' | 'primary' | 'accent' | 'warning' | 'destructive';
   type: 'circular-progress' | 'text-value' | 'fraction';
 }
