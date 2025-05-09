@@ -14,8 +14,8 @@ body {
     --card: 0 0% 100%; /* White cards on light gray background */
     --card-foreground: 210 20% 20%; /* Dark text on cards */
     
-    --life-okr-card-background: 207 70% 97%; /* Very light blue for Life OKR cards #F5FAFD */
-    --area-okr-card-background: 180 25% 96%; /* Very light teal/mint for Area OKR sections #F2FBF7 */
+    --life-okr-card-background: 207 70% 96%; /* Slightly more saturated light blue #F2F9FC */
+    --area-okr-card-background: 210 20% 97.5%; /* Very light neutral gray #F8F9FA */
 
 
     --popover: 0 0% 100%;
@@ -75,8 +75,8 @@ body {
     --card: 210 15% 18%; /* Slightly lighter dark for cards */
     --card-foreground: 204 17% 95%;
 
-    --life-okr-card-background: 207 70% 22%; /* Darker, subtle blue for Life OKR cards #2A4A6C */
-    --area-okr-card-background: 180 25% 20%; /* Darker, subtle teal/mint for Area OKR sections #263D35 */
+    --life-okr-card-background: 207 70% 20%; /* Darker blue #254360 */
+    --area-okr-card-background: 210 15% 23%; /* Darker neutral gray #33373D */
 
 
     --popover: 210 15% 18%;
