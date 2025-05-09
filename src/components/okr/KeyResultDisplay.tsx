@@ -6,8 +6,17 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Check, Edit3, Save, X } from 'lucide-react';
+import { Check, Edit3, Save, X, CalendarClock, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { format } from 'date-fns';
+
 
 interface KeyResultDisplayProps {
   keyResult: KeyResult;
@@ -25,7 +34,7 @@ export function KeyResultDisplay({ keyResult, onUpdateKeyResult, objectiveId }: 
 
   const progressPercentage = keyResult.targetValue > 0 
     ? Math.min(Math.max((keyResult.currentValue / keyResult.targetValue) * 100, 0), 100) 
-    : keyResult.currentValue > 0 ? 100 : 0; // if target is 0, any current value > 0 is 100%
+    : keyResult.currentValue > 0 ? 100 : 0; 
 
   const handleUpdate = () => {
     const newCurrentValue = parseFloat(currentValueInput);
@@ -40,59 +49,79 @@ export function KeyResultDisplay({ keyResult, onUpdateKeyResult, objectiveId }: 
   };
   
   const handleEditToggle = () => {
-    if (isEditing) { // If cancelling edit
-      setCurrentValueInput(keyResult.currentValue.toString()); // Reset input to original value
+    if (isEditing) { 
+      setCurrentValueInput(keyResult.currentValue.toString()); 
     }
     setIsEditing(!isEditing);
   };
 
   const progressColor = progressPercentage === 100 ? 'bg-accent' : 'bg-primary';
 
+  const formattedLastUpdated = keyResult.lastUpdated 
+    ? format(new Date(keyResult.lastUpdated), "MMM dd, yyyy HH:mm")
+    : 'N/A';
+
   return (
-    <div className="p-4 border rounded-lg shadow-sm bg-background hover:shadow-md transition-shadow duration-200 space-y-3">
-      <h4 className="font-semibold text-md text-foreground">{keyResult.title}</h4>
-      
-      <div className="space-y-1">
-        <div className="flex justify-between items-center text-sm text-muted-foreground">
-          <span>Progress</span>
-          <span className={cn("font-medium", progressPercentage === 100 ? "text-accent" : "text-primary")}>
-            {keyResult.currentValue.toLocaleString()} / {keyResult.targetValue.toLocaleString()} ({keyResult.unit})
-          </span>
+    <TooltipProvider>
+      <div className="p-4 border rounded-lg shadow-sm bg-background hover:shadow-md transition-shadow duration-200 space-y-3">
+        <div className="flex justify-between items-start">
+          <h4 className="font-semibold text-md text-foreground flex-1">{keyResult.title}</h4>
+          <Tooltip>
+            <TooltipTrigger asChild>
+               <Badge variant="outline" className="ml-2 capitalize cursor-default">
+                <CalendarClock className="h-3 w-3 mr-1.5" />
+                {keyResult.trackingFrequency}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Tracking Frequency: {keyResult.trackingFrequency}</p>
+              <p>Last Updated: {formattedLastUpdated}</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
-        <Progress value={progressPercentage} className="h-3" indicatorClassName={progressColor} />
-        {progressPercentage === 100 && (
-            <div className="flex items-center text-sm text-accent mt-1">
-                <Check className="h-4 w-4 mr-1" />
-                <span>Completed!</span>
+        
+        <div className="space-y-1">
+          <div className="flex justify-between items-center text-sm text-muted-foreground">
+            <span>Progress</span>
+            <span className={cn("font-medium", progressPercentage === 100 ? "text-accent" : "text-primary")}>
+              {keyResult.currentValue.toLocaleString()} / {keyResult.targetValue.toLocaleString()} ({keyResult.unit})
+            </span>
+          </div>
+          <Progress value={progressPercentage} className="h-3" indicatorClassName={progressColor} />
+          {progressPercentage === 100 && (
+              <div className="flex items-center text-sm text-accent mt-1">
+                  <Check className="h-4 w-4 mr-1" />
+                  <span>Completed!</span>
+              </div>
+          )}
+        </div>
+
+        {isEditing ? (
+          <div className="space-y-2">
+            <Label htmlFor={`kr-update-${keyResult.id}`} className="text-sm font-medium">Update Current Value:</Label>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="number"
+                id={`kr-update-${keyResult.id}`}
+                value={currentValueInput}
+                onChange={handleInputChange}
+                className="flex-grow"
+                aria-label={`Update current value for ${keyResult.title}`}
+              />
+              <Button onClick={handleUpdate} size="icon" variant="outline" aria-label="Save progress">
+                <Save className="h-4 w-4" />
+              </Button>
+              <Button onClick={handleEditToggle} size="icon" variant="ghost" aria-label="Cancel edit">
+                <X className="h-4 w-4" />
+              </Button>
             </div>
+          </div>
+        ) : (
+          <Button onClick={handleEditToggle} variant="outline" size="sm" className="w-full md:w-auto">
+            <Edit3 className="mr-2 h-4 w-4" /> Update Progress
+          </Button>
         )}
       </div>
-
-      {isEditing ? (
-        <div className="space-y-2">
-          <Label htmlFor={`kr-update-${keyResult.id}`} className="text-sm font-medium">Update Current Value:</Label>
-          <div className="flex items-center space-x-2">
-            <Input
-              type="number"
-              id={`kr-update-${keyResult.id}`}
-              value={currentValueInput}
-              onChange={handleInputChange}
-              className="flex-grow"
-              aria-label={`Update current value for ${keyResult.title}`}
-            />
-            <Button onClick={handleUpdate} size="icon" variant="outline" aria-label="Save progress">
-              <Save className="h-4 w-4" />
-            </Button>
-            <Button onClick={handleEditToggle} size="icon" variant="ghost" aria-label="Cancel edit">
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <Button onClick={handleEditToggle} variant="outline" size="sm" className="w-full md:w-auto">
-          <Edit3 className="mr-2 h-4 w-4" /> Update Progress
-        </Button>
-      )}
-    </div>
+    </TooltipProvider>
   );
 }

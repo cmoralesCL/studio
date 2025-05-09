@@ -7,16 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Trash2, PlusCircle } from 'lucide-react';
-import type { ObjectiveFormData } from '@/lib/types';
-import { FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import type { ObjectiveFormData, TrackingFrequency } from '@/lib/types';
+import { FormField, FormItem, FormControl, FormMessage, FormLabel as ShadcnFormLabel } from '@/components/ui/form'; // Renamed FormLabel to avoid conflict
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 interface KeyResultInputArrayProps {
   control: Control<ObjectiveFormData>;
   errors: FieldErrors<ObjectiveFormData>;
+  trackingFrequencies: TrackingFrequency[];
 }
 
-export function KeyResultInputArray({ control, errors }: KeyResultInputArrayProps) {
+export function KeyResultInputArray({ control, errors, trackingFrequencies }: KeyResultInputArrayProps) {
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'keyResults',
@@ -48,7 +51,7 @@ export function KeyResultInputArray({ control, errors }: KeyResultInputArrayProp
             name={`keyResults.${index}.title`}
             render={({ field }) => (
               <FormItem>
-                <Label htmlFor={field.name}>Title</Label>
+                <ShadcnFormLabel htmlFor={field.name}>Title</ShadcnFormLabel>
                 <FormControl>
                   <Textarea placeholder="e.g., Increase user engagement by 15%" {...field} />
                 </FormControl>
@@ -63,7 +66,7 @@ export function KeyResultInputArray({ control, errors }: KeyResultInputArrayProp
               name={`keyResults.${index}.targetValue`}
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor={field.name}>Target Value</Label>
+                  <ShadcnFormLabel htmlFor={field.name}>Target Value</ShadcnFormLabel>
                   <FormControl>
                     <Input type="number" placeholder="e.g., 1000" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
                   </FormControl>
@@ -76,7 +79,7 @@ export function KeyResultInputArray({ control, errors }: KeyResultInputArrayProp
               name={`keyResults.${index}.unit`}
               render={({ field }) => (
                 <FormItem>
-                  <Label htmlFor={field.name}>Unit</Label>
+                  <ShadcnFormLabel htmlFor={field.name}>Unit</ShadcnFormLabel>
                   <FormControl>
                     <Input placeholder="e.g., %, users, $" {...field} />
                   </FormControl>
@@ -85,12 +88,36 @@ export function KeyResultInputArray({ control, errors }: KeyResultInputArrayProp
               )}
             />
           </div>
+          <FormField
+            control={control}
+            name={`keyResults.${index}.trackingFrequency`}
+            render={({ field }) => (
+              <FormItem>
+                <ShadcnFormLabel>Tracking Frequency</ShadcnFormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select tracking frequency" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {trackingFrequencies.map(freq => (
+                      <SelectItem key={freq} value={freq}>
+                        {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage>{errors.keyResults?.[index]?.trackingFrequency?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
         </div>
       ))}
       <Button
         type="button"
         variant="outline"
-        onClick={() => append({ title: '', targetValue: 0, unit: '' })}
+        onClick={() => append({ title: '', targetValue: 0, unit: '', trackingFrequency: 'once' })}
         className="w-full"
       >
         <PlusCircle className="mr-2 h-4 w-4" /> Add Key Result

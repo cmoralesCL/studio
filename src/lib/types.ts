@@ -1,9 +1,13 @@
+export type TrackingFrequency = 'once' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annually';
+
 export interface KeyResult {
   id: string;
   title: string;
   currentValue: number;
   targetValue: number;
   unit: string; // e.g., '%', 'USD', 'tasks'
+  trackingFrequency: TrackingFrequency;
+  lastUpdated: string; // ISO date string
 }
 
 export type ObjectiveLevel = 'Company' | 'Team' | 'Individual' | 'Personal';
@@ -21,6 +25,7 @@ export interface KeyResultFormData {
   title: string;
   targetValue: number;
   unit: string;
+  trackingFrequency: TrackingFrequency;
 }
 
 export interface ObjectiveFormData {

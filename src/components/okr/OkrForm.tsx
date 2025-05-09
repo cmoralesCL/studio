@@ -9,17 +9,19 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import type { Objective, ObjectiveFormData, ObjectiveLevel, KeyResultFormData } from '@/lib/types';
+import type { Objective, ObjectiveFormData, ObjectiveLevel, KeyResultFormData, TrackingFrequency } from '@/lib/types';
 import { KeyResultInputArray } from './KeyResultInputArray';
 import { AiSuggestKeyResults } from './AiSuggestKeyResults';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const objectiveLevels: ObjectiveLevel[] = ['Company', 'Team', 'Individual', 'Personal'];
+const trackingFrequencies: TrackingFrequency[] = ['once', 'daily', 'weekly', 'monthly', 'quarterly', 'annually'];
 
 const keyResultSchema = z.object({
   title: z.string().min(1, 'Key Result title is required.'),
   targetValue: z.number().min(0, 'Target value must be non-negative.'),
   unit: z.string().min(1, 'Unit is required.'),
+  trackingFrequency: z.enum(trackingFrequencies, { required_error: 'Tracking frequency is required.'}),
 });
 
 const objectiveFormSchema = z.object({
@@ -48,13 +50,14 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
             title: kr.title,
             targetValue: kr.targetValue,
             unit: kr.unit,
+            trackingFrequency: kr.trackingFrequency,
           })),
         }
       : {
           title: '',
           description: '',
           level: 'Personal',
-          keyResults: [{ title: '', targetValue: 0, unit: '' }],
+          keyResults: [{ title: '', targetValue: 0, unit: '', trackingFrequency: 'once' }],
         },
   });
 
@@ -66,26 +69,17 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
   const [currentObjectiveTitleForAI, setCurrentObjectiveTitleForAI] = useState(objectiveTitleWatcher || '');
 
   useEffect(() => {
-    // Debounce or use a button to update AI context to avoid too many re-renders if AI component reacts directly
     const handler = setTimeout(() => {
       setCurrentObjectiveTitleForAI(objectiveTitleWatcher);
-    }, 500); // Delay for user to finish typing
+    }, 500); 
     return () => clearTimeout(handler);
   }, [objectiveTitleWatcher]);
 
 
   const handleAddSuggestions = (suggestions: Pick<KeyResultFormData, 'title'>[]) => {
-    suggestions.forEach(suggestion => {
-      form.setValue('keyResults', [
-        ...form.getValues('keyResults').filter(kr => kr.title !== ''), // Keep existing filled KRs
-        { title: suggestion.title, targetValue: 0, unit: '' }
-      ]);
-    });
-     // Trigger re-render of KeyResultInputArray if necessary or useFieldArray's append
-     // A more robust way with useFieldArray:
-     const currentKRs = form.getValues('keyResults').filter(kr => kr.title !== ''); // Remove empty ones first
-     const newKRs = suggestions.map(s => ({ title: s.title, targetValue: 0, unit: '' }));
-     form.reset({ // reset form to update field array correctly
+    const currentKRs = form.getValues('keyResults').filter(kr => kr.title !== ''); 
+    const newKRs = suggestions.map(s => ({ title: s.title, targetValue: 0, unit: '', trackingFrequency: 'once' as TrackingFrequency }));
+    form.reset({ 
         ...form.getValues(),
         keyResults: [...currentKRs, ...newKRs],
      });
@@ -95,7 +89,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <ScrollArea className="h-[calc(100vh-20rem)] md:h-[60vh] pr-6"> {/* Adjust height as needed */}
+        <ScrollArea className="h-[calc(100vh-20rem)] md:h-[60vh] pr-6"> 
           <div className="space-y-6">
             <FormField
               control={form.control}
@@ -156,7 +150,11 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
               disabled={isLoading}
             />
 
-            <KeyResultInputArray control={form.control} errors={form.formState.errors} />
+            <KeyResultInputArray 
+              control={form.control} 
+              errors={form.formState.errors} 
+              trackingFrequencies={trackingFrequencies}
+            />
           </div>
         </ScrollArea>
 
