@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -8,9 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Trash2, PlusCircle } from 'lucide-react';
 import type { ObjectiveFormData, TrackingFrequency } from '@/lib/types';
-import { FormField, FormItem, FormControl, FormMessage, FormLabel as ShadcnFormLabel } from '@/components/ui/form'; // Renamed FormLabel to avoid conflict
+import { FormField, FormItem, FormControl, FormMessage, FormLabel as ShadcnFormLabel } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DatePicker } from '@/components/ui/date-picker';
 
 
 interface KeyResultInputArrayProps {
@@ -88,36 +90,55 @@ export function KeyResultInputArray({ control, errors, trackingFrequencies }: Ke
               )}
             />
           </div>
-          <FormField
-            control={control}
-            name={`keyResults.${index}.trackingFrequency`}
-            render={({ field }) => (
-              <FormItem>
-                <ShadcnFormLabel>Tracking Frequency</ShadcnFormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={control}
+              name={`keyResults.${index}.trackingFrequency`}
+              render={({ field }) => (
+                <FormItem>
+                  <ShadcnFormLabel>Tracking Frequency</ShadcnFormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select tracking frequency" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {trackingFrequencies.map(freq => (
+                        <SelectItem key={freq} value={freq}>
+                          {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage>{errors.keyResults?.[index]?.trackingFrequency?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name={`keyResults.${index}.targetDate`}
+              render={({ field }) => (
+                <FormItem>
+                  <ShadcnFormLabel htmlFor={field.name}>Target Date (Optional)</ShadcnFormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select tracking frequency" />
-                    </SelectTrigger>
+                     <DatePicker
+                        value={field.value ? new Date(field.value) : undefined}
+                        onChange={(date) => field.onChange(date ? date.toISOString() : undefined)}
+                        placeholder="Select target date"
+                      />
                   </FormControl>
-                  <SelectContent>
-                    {trackingFrequencies.map(freq => (
-                      <SelectItem key={freq} value={freq}>
-                        {freq.charAt(0).toUpperCase() + freq.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage>{errors.keyResults?.[index]?.trackingFrequency?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
+                  <FormMessage>{errors.keyResults?.[index]?.targetDate?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
       ))}
       <Button
         type="button"
         variant="outline"
-        onClick={() => append({ title: '', targetValue: 0, unit: '', trackingFrequency: 'once' })}
+        onClick={() => append({ title: '', targetValue: 0, unit: '', trackingFrequency: 'once', targetDate: undefined })}
         className="w-full"
       >
         <PlusCircle className="mr-2 h-4 w-4" /> Add Key Result

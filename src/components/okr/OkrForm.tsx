@@ -22,6 +22,7 @@ const keyResultSchema = z.object({
   targetValue: z.number().min(0, 'Target value must be non-negative.'),
   unit: z.string().min(1, 'Unit is required.'),
   trackingFrequency: z.enum(trackingFrequencies, { required_error: 'Tracking frequency is required.'}),
+  targetDate: z.string().optional().nullable(), // ISO date string, optional
 });
 
 const objectiveFormSchema = z.object({
@@ -51,13 +52,14 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
             targetValue: kr.targetValue,
             unit: kr.unit,
             trackingFrequency: kr.trackingFrequency,
+            targetDate: kr.targetDate || undefined,
           })),
         }
       : {
           title: '',
           description: '',
           level: 'Personal',
-          keyResults: [{ title: '', targetValue: 0, unit: '', trackingFrequency: 'once' }],
+          keyResults: [{ title: '', targetValue: 0, unit: '', trackingFrequency: 'once', targetDate: undefined }],
         },
   });
 
@@ -78,7 +80,13 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
 
   const handleAddSuggestions = (suggestions: Pick<KeyResultFormData, 'title'>[]) => {
     const currentKRs = form.getValues('keyResults').filter(kr => kr.title !== ''); 
-    const newKRs = suggestions.map(s => ({ title: s.title, targetValue: 0, unit: '', trackingFrequency: 'once' as TrackingFrequency }));
+    const newKRs = suggestions.map(s => ({ 
+        title: s.title, 
+        targetValue: 0, 
+        unit: '', 
+        trackingFrequency: 'once' as TrackingFrequency,
+        targetDate: undefined 
+    }));
     form.reset({ 
         ...form.getValues(),
         keyResults: [...currentKRs, ...newKRs],

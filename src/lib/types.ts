@@ -8,6 +8,7 @@ export interface KeyResult {
   unit: string; // e.g., '%', 'USD', 'tasks'
   trackingFrequency: TrackingFrequency;
   lastUpdated: string; // ISO date string
+  targetDate?: string; // Optional: Specific deadline for the KR or current cycle
 }
 
 export type ObjectiveLevel = 'Company' | 'Team' | 'Individual' | 'Personal';
@@ -26,6 +27,7 @@ export interface KeyResultFormData {
   targetValue: number;
   unit: string;
   trackingFrequency: TrackingFrequency;
+  targetDate?: string; // Optional
 }
 
 export interface ObjectiveFormData {

@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Check, Edit3, Save, X, CalendarClock, Info } from 'lucide-react';
+import { Check, Edit3, Save, X, CalendarClock, AlertTriangle, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -15,7 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { format } from 'date-fns';
+import { format, isPast } from 'date-fns';
 
 
 interface KeyResultDisplayProps {
@@ -60,26 +60,53 @@ export function KeyResultDisplay({ keyResult, onUpdateKeyResult, objectiveId }: 
   const formattedLastUpdated = keyResult.lastUpdated 
     ? format(new Date(keyResult.lastUpdated), "MMM dd, yyyy HH:mm")
     : 'N/A';
+  
+  const formattedTargetDate = keyResult.targetDate
+    ? format(new Date(keyResult.targetDate), "MMM dd, yyyy")
+    : null;
+
+  const isOverdue = keyResult.targetDate && isPast(new Date(keyResult.targetDate)) && progressPercentage < 100;
 
   return (
     <TooltipProvider>
       <div className="p-4 border rounded-lg shadow-sm bg-background hover:shadow-md transition-shadow duration-200 space-y-3">
         <div className="flex justify-between items-start">
           <h4 className="font-semibold text-md text-foreground flex-1">{keyResult.title}</h4>
-          <Tooltip>
-            <TooltipTrigger asChild>
-               <Badge variant="outline" className="ml-2 capitalize cursor-default">
-                <CalendarClock className="h-3 w-3 mr-1.5" />
-                {keyResult.trackingFrequency}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Tracking Frequency: {keyResult.trackingFrequency}</p>
-              <p>Last Updated: {formattedLastUpdated}</p>
-            </TooltipContent>
-          </Tooltip>
+          <div className="flex items-center space-x-1">
+            {isOverdue && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-destructive-foreground bg-destructive p-1 rounded-sm">This Key Result is overdue.</p>
+                   {formattedTargetDate && <p>Target Date: {formattedTargetDate}</p>}
+                </TooltipContent>
+              </Tooltip>
+            )}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="outline" className="capitalize cursor-default">
+                  <CalendarClock className="h-3 w-3 mr-1.5" />
+                  {keyResult.trackingFrequency}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Tracking: {keyResult.trackingFrequency}</p>
+                <p>Last Updated: {formattedLastUpdated}</p>
+                {formattedTargetDate && <p>Target Date: {formattedTargetDate}</p>}
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
         
+        {formattedTargetDate && (
+          <div className="flex items-center text-xs text-muted-foreground">
+            <CalendarDays className="h-3 w-3 mr-1.5" />
+            <span>Target: {formattedTargetDate}</span>
+          </div>
+        )}
+
         <div className="space-y-1">
           <div className="flex justify-between items-center text-sm text-muted-foreground">
             <span>Progress</span>

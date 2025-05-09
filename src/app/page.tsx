@@ -19,10 +19,32 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { addDays, endOfYear, formatISO } from 'date-fns';
 
 // Helper to generate unique IDs
 const generateId = () => crypto.randomUUID();
 const getCurrentISODate = () => new Date().toISOString();
+
+const getNextWeekendDateISO = () => {
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
+  // Target next Sunday. If today is Sunday, target next Sunday.
+  const daysUntilSunday = dayOfWeek === 0 ? 7 : (7 - dayOfWeek);
+  const nextSunday = new Date(today);
+  nextSunday.setDate(today.getDate() + daysUntilSunday);
+  nextSunday.setHours(23, 59, 59, 999);
+  return nextSunday.toISOString();
+}
+
+const getEndOfQuarterDateISO = () => {
+    const today = new Date();
+    const currentQuarter = Math.floor((today.getMonth() / 3));
+    const firstDayOfNextQuarter = new Date(today.getFullYear(), currentQuarter * 3 + 3, 1);
+    const lastDayOfCurrentQuarter = new Date(firstDayOfNextQuarter.setDate(0)); // Set to last day of previous month
+    lastDayOfCurrentQuarter.setHours(23,59,59,999);
+    return lastDayOfCurrentQuarter.toISOString();
+}
+
 
 const exampleObjectives: Objective[] = [
   // Okr de Vida
@@ -32,8 +54,8 @@ const exampleObjectives: Objective[] = [
     description: "Objetivos para mejorar conexiones con otros.",
     level: "Personal",
     keyResults: [
-      { id: generateId(), title: "Tener una conversación significativa con un miembro de mi familia cada semana", currentValue: 0, targetValue: 1, unit: "conversación/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Salir con amigos o seres queridos al menos dos veces al mes", currentValue: 0, targetValue: 2, unit: "veces/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Tener una conversación significativa con un miembro de mi familia cada semana", currentValue: 0, targetValue: 1, unit: "conversación/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
+      { id: generateId(), title: "Salir con amigos o seres queridos al menos dos veces al mes", currentValue: 0, targetValue: 2, unit: "veces/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() }, // No specific single date, recurring
       { id: generateId(), title: "Dedicar tiempo a escuchar y apoyar a mis amigos y familiares", currentValue: 0, targetValue: 5, unit: "interacciones/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
     ],
   },
@@ -43,8 +65,8 @@ const exampleObjectives: Objective[] = [
     description: "Objetivos para expandir horizontes y aprender sobre el mundo.",
     level: "Personal",
     keyResults: [
-      { id: generateId(), title: "Planear un viaje a un país que no conozca este año", currentValue: 0, targetValue: 1, unit: "viaje planeado", trackingFrequency: "annually", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Leer al menos 3 libros sobre diferentes culturas y tradiciones", currentValue: 0, targetValue: 3, unit: "libros", trackingFrequency: "once", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Planear un viaje a un país que no conozca este año", currentValue: 0, targetValue: 1, unit: "viaje planeado", trackingFrequency: "annually", lastUpdated: getCurrentISODate(), targetDate: endOfYear(new Date()).toISOString() },
+      { id: generateId(), title: "Leer al menos 3 libros sobre diferentes culturas y tradiciones", currentValue: 0, targetValue: 3, unit: "libros", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 90).toISOString() }, // Target in 3 months
       { id: generateId(), title: "Probar la cocina de diferentes países al menos una vez al mes", currentValue: 0, targetValue: 1, unit: "cocina nueva/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
     ],
   },
@@ -55,7 +77,7 @@ const exampleObjectives: Objective[] = [
     level: "Personal",
     keyResults: [
       { id: generateId(), title: "Ser voluntario en una organización benéfica al menos una vez al mes", currentValue: 0, targetValue: 1, unit: "voluntariado/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Donar un porcentaje de mis ingresos a causas que me importan trimestralmente", currentValue: 0, targetValue: 1, unit: "donación/trimestre", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Donar un porcentaje de mis ingresos a causas que me importan trimestralmente", currentValue: 0, targetValue: 1, unit: "donación/trimestre", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: getEndOfQuarterDateISO() },
       { id: generateId(), title: "Participar en actividades cívicas o políticas para promover el cambio social", currentValue: 0, targetValue: 2, unit: "actividades/año", trackingFrequency: "annually", lastUpdated: getCurrentISODate() },
     ],
   },
@@ -66,8 +88,8 @@ const exampleObjectives: Objective[] = [
     description: "Objetivos relacionados con el crecimiento laboral.",
     level: "Team", 
     keyResults: [
-      { id: generateId(), title: "Completar un curso o certificación relevante en los próximos tres meses", currentValue: 0, targetValue: 1, unit: "curso", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Liderar o participar activamente en un proyecto clave", currentValue: 0, targetValue: 1, unit: "proyecto", trackingFrequency: "once", lastUpdated: getCurrentISODate() },
+      { id: generateId(), title: "Completar un curso o certificación relevante en los próximos tres meses", currentValue: 0, targetValue: 1, unit: "curso", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 90).toISOString() },
+      { id: generateId(), title: "Liderar o participar activamente en un proyecto clave", currentValue: 0, targetValue: 1, unit: "proyecto", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 60).toISOString() },
       { id: generateId(), title: "Recibir comentarios positivos de superiores y compañeros", currentValue: 0, targetValue: 3, unit: "feedbacks", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate() },
     ],
   },
@@ -77,7 +99,7 @@ const exampleObjectives: Objective[] = [
     description: "Objetivos para optimizar el rendimiento laboral.",
     level: "Individual",
     keyResults: [
-      { id: generateId(), title: "Implementar un sistema de gestión del tiempo (Pomodoro) y usarlo diariamente", currentValue: 0, targetValue: 1, unit: "sistema implementado", trackingFrequency: "once", lastUpdated: getCurrentISODate() }, // Changed to 'once' for initial implementation
+      { id: generateId(), title: "Implementar un sistema de gestión del tiempo (Pomodoro) y usarlo diariamente", currentValue: 0, targetValue: 1, unit: "sistema implementado", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: addDays(new Date(), 7).toISOString() },
       { id: generateId(), title: "Reducir el tiempo dedicado a tareas no esenciales en un 20%", currentValue: 0, targetValue: 20, unit: "%", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
       { id: generateId(), title: "Completar todas mis tareas prioritarias antes de finalizar cada día laboral (objetivo: 5 días/semana)", currentValue: 0, targetValue: 5, unit: "días/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate() },
     ],
@@ -90,7 +112,7 @@ const exampleObjectives: Objective[] = [
     level: "Personal",
     keyResults: [
       { id: generateId(), title: "Hacer ejercicio al menos 3 veces por semana", currentValue: 0, targetValue: 3, unit: "veces/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate() },
-      { id: generateId(), title: "Meditar durante 10 minutos diarios (objetivo: 7 días/semana)", currentValue: 0, targetValue: 7, unit: "días/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate() }, // Changed target to days for weekly tracking
+      { id: generateId(), title: "Meditar durante 10 minutos diarios (objetivo: 7 días/semana)", currentValue: 0, targetValue: 7, unit: "días/semana", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO() },
       { id: generateId(), title: "Leer al menos un libro al mes sobre desarrollo personal", currentValue: 0, targetValue: 1, unit: "libro/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate() },
     ],
   },
@@ -113,13 +135,23 @@ export default function OkrTrackerPage() {
     if (storedObjectives && storedObjectives !== '[]') {
       try {
         const parsedObjectives: Objective[] = JSON.parse(storedObjectives);
+        // Check if the stored data adheres to the Objective structure and if KRs have all required fields
         if (Array.isArray(parsedObjectives) && parsedObjectives.every(obj => 
             obj.id && obj.title && Array.isArray(obj.keyResults) && 
-            obj.keyResults.every(kr => kr.id && kr.title && kr.hasOwnProperty('currentValue') && kr.hasOwnProperty('targetValue') && kr.unit && kr.trackingFrequency && kr.lastUpdated)
+            obj.keyResults.every(kr => 
+                kr.id && kr.title && 
+                kr.hasOwnProperty('currentValue') && typeof kr.currentValue === 'number' &&
+                kr.hasOwnProperty('targetValue') && typeof kr.targetValue === 'number' &&
+                kr.unit && typeof kr.unit === 'string' &&
+                kr.trackingFrequency && typeof kr.trackingFrequency === 'string' &&
+                kr.lastUpdated && typeof kr.lastUpdated === 'string' &&
+                // targetDate is optional, so check its type if it exists
+                (kr.targetDate === undefined || kr.targetDate === null || typeof kr.targetDate === 'string')
+            )
         )) {
             setObjectives(parsedObjectives);
         } else {
-            console.warn("Stored objectives are not in the expected format or missing new fields. Loading example objectives.");
+            console.warn("Stored objectives are not in the expected format or missing fields. Loading example objectives.");
             localStorage.removeItem('okrObjectives');
             setObjectives(exampleObjectives);
         }
@@ -154,6 +186,7 @@ export default function OkrTrackerPage() {
         id: generateId(),
         currentValue: 0, 
         lastUpdated: getCurrentISODate(),
+        targetDate: kr.targetDate || undefined, // Ensure targetDate is correctly passed
       })),
     };
     setObjectives(prev => [newObjective, ...prev]);
@@ -206,7 +239,11 @@ export default function OkrTrackerPage() {
   
   
   const handleEditObjective = (objective: Objective) => {
-    toast({ title: "Edit Action", description: `Editing: ${objective.title} (not implemented yet)`});
+    // This would typically open the AddOkrDialog with initialData populated
+    // For now, just a toast message.
+    // setEditingObjective(objective); // You'd need state for this
+    // setIsAddOkrDialogOpen(true);
+    toast({ title: "Edit Action", description: `Editing: ${objective.title} (not fully implemented yet)`});
   };
 
   if (!isClient) {
@@ -247,6 +284,8 @@ export default function OkrTrackerPage() {
           onOpenChange={setIsAddOkrDialogOpen}
           onAddObjective={handleAddObjective}
           isLoading={isLoading}
+          // key={editingObjective ? editingObjective.id : 'add-new'} // To re-mount form for editing
+          // initialData={editingObjective} // Pass data for editing
         />
 
         {objectiveToDelete && (
