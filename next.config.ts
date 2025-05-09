@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: [], // Add your production domain here if needed, e.g. ['mydomain.com']
+      // You can also specify allowedForwardedHosts if behind a proxy
+    },
+  },
 };
 
 export default nextConfig;
