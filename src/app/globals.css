@@ -44,6 +44,15 @@ body {
     
     --radius: 0.5rem;
 
+    /* Custom progress colors */
+    --success: 145 63% 49%; /* Green, same as accent for now */
+    --success-foreground: 0 0% 100%;
+    --warning: 45 90% 55%; /* Bright yellow/amber */
+    --warning-foreground: 210 20% 20%; /* Dark text on yellow */
+    --danger: 0 84.2% 60.2%; /* Red, same as destructive */
+    --danger-foreground: 0 0% 98%;
+
+
     /* Existing sidebar variables, kept for compatibility if shadcn/ui components use them */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -90,6 +99,14 @@ body {
     --chart-4: 145 63% 60%; /* Lighter Green */
     --chart-5: 207 50% 50%; /* Muted Blue */
 
+    /* Custom progress colors */
+    --success: 145 63% 49%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 90% 50%;
+    --warning-foreground: 210 15% 85%; /* Lighter text on dark yellow */
+    --danger: 0 70% 50%;
+    --danger-foreground: 0 0% 98%;
+
     /* Existing sidebar variables for dark mode */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -109,4 +126,21 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom styling for shadcn Progress component indicator */
+.progress-indicator-success {
+  background-color: hsl(var(--success));
+}
+.progress-indicator-warning {
+  background-color: hsl(var(--warning));
+}
+.progress-indicator-danger {
+  background-color: hsl(var(--danger));
+}
+.progress-indicator-primary {
+  background-color: hsl(var(--primary));
+}
+.progress-indicator-default {
+   background-color: hsl(var(--secondary-foreground)); /* Or a neutral gray */
 }

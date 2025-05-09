@@ -2,93 +2,110 @@
 'use client';
 
 import React from 'react';
-import type { Objective, KeyResult } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import type { Objective } from '@/lib/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { KeyResultDisplay } from './KeyResultDisplay';
-import { OkrProgressChart } from './OkrProgressChart';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, EyeOff, Eye, Target } from 'lucide-react';
+import { 
+  Trash2, 
+  Edit, 
+  Heart, 
+  Zap, 
+  Target as TargetIcon,
+  Briefcase,
+  Activity,
+  Landmark,
+  Users,
+  Award,
+  FolderArchive,
+  ChevronDown,
+  ChevronUp
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface OkrCardProps {
   objective: Objective;
-  onUpdateKeyResult: (objectiveId: string, krId: string, newCurrentValue: number) => void;
+  onUpdateKeyResult: (objectiveId: string, krId: string, newCurrentValue: number) => void; // Kept if updates happen elsewhere
   onDeleteObjective: (objectiveId: string) => void;
-  onEditObjective: (objective: Objective) => void; // For future editing functionality
+  onEditObjective: (objective: Objective) => void; 
 }
 
-export function OkrCard({ objective, onUpdateKeyResult, onDeleteObjective, onEditObjective }: OkrCardProps) {
-  const [showChart, setShowChart] = React.useState(true);
+const iconMap: Record<NonNullable<Objective['icon']>, React.ElementType> = {
+  Heart: Heart,
+  Zap: Zap,
+  Target: TargetIcon,
+  Briefcase: Briefcase,
+  Activity: Activity,
+  Landmark: Landmark,
+  Users: Users,
+  Award: Award,
+  FolderArchive: FolderArchive,
+};
 
-  const overallProgress = React.useMemo(() => {
-    if (objective.keyResults.length === 0) return 0;
-    const totalProgress = objective.keyResults.reduce((sum, kr) => {
-      const krProgress = kr.targetValue > 0 ? (kr.currentValue / kr.targetValue) * 100 : (kr.currentValue > 0 ? 100 : 0);
-      return sum + Math.min(Math.max(krProgress, 0), 100);
-    }, 0);
-    return totalProgress / objective.keyResults.length;
-  }, [objective.keyResults]);
+export function OkrCard({ objective, onUpdateKeyResult, onDeleteObjective, onEditObjective }: OkrCardProps) {
+  const [isExpanded, setIsExpanded] = React.useState(true);
+  const ObjectiveIcon = objective.icon ? iconMap[objective.icon] : TargetIcon;
 
   return (
-    <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-2xl font-semibold text-primary flex items-center">
-              <Target className="h-6 w-6 mr-3 text-primary" />
+    <Card className="w-full shadow-md bg-card rounded-lg">
+      <CardHeader 
+        className="p-4 cursor-pointer hover:bg-muted/50 transition-colors" 
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <ObjectiveIcon className={cn("h-5 w-5 mr-3", 
+              objective.icon === 'Heart' ? 'text-red-500' : 
+              objective.icon === 'Zap' ? 'text-yellow-500' : 'text-primary'
+            )} />
+            <CardTitle className="text-lg font-semibold text-foreground">
               {objective.title}
             </CardTitle>
-            <Badge variant="outline" className="mt-1">{objective.level}</Badge>
           </div>
-          <div className="flex space-x-2">
-             {/* <Button variant="ghost" size="icon" onClick={() => onEditObjective(objective)} aria-label="Edit Objective">
-              <Edit className="h-5 w-5" />
-            </Button> TODO: Implement edit objective functionality */}
-            <Button variant="ghost" size="icon" onClick={() => onDeleteObjective(objective.id)} aria-label="Delete Objective" className="text-destructive hover:bg-destructive/10">
-              <Trash2 className="h-5 w-5" />
+          <div className="flex items-center space-x-1">
+            {/* <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={(e) => { e.stopPropagation(); onEditObjective(objective);}} 
+              aria-label="Edit Objective"
+              className="h-7 w-7"
+            >
+              <Edit className="h-4 w-4" />
+            </Button> */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={(e) => { e.stopPropagation(); onDeleteObjective(objective.id); }} 
+              aria-label="Delete Objective" 
+              className="text-destructive hover:bg-destructive/10 h-7 w-7"
+            >
+              <Trash2 className="h-4 w-4" />
             </Button>
+             {isExpanded ? <ChevronUp className="h-5 w-5 text-muted-foreground" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
           </div>
         </div>
-        {objective.description && (
-          <CardDescription className="pt-2 text-muted-foreground">{objective.description}</CardDescription>
+        {objective.description && isExpanded && (
+          <CardDescription className="pt-1 text-sm text-muted-foreground ml-8">
+            {objective.description}
+          </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-sm font-medium text-foreground">Overall Objective Progress</span>
-            <span className="text-sm font-semibold text-primary">{overallProgress.toFixed(1)}%</span>
+      
+      {isExpanded && (
+        <CardContent className="p-0"> {/* Adjusted padding */}
+          <div className="space-y-0"> {/* Removed space-y-4 for tighter list */}
+            {objective.keyResults.map(kr => (
+              <KeyResultDisplay 
+                key={kr.id} 
+                keyResult={kr}
+              />
+            ))}
+            {objective.keyResults.length === 0 && (
+              <p className="px-4 py-3 text-sm text-muted-foreground">No key results for this objective yet.</p>
+            )}
           </div>
-          <Progress value={overallProgress} className="h-3" indicatorClassName={overallProgress === 100 ? "bg-accent" : "bg-primary"} />
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-foreground">Key Results:</h3>
-          {objective.keyResults.map(kr => (
-            <KeyResultDisplay 
-              key={kr.id} 
-              keyResult={kr} 
-              objectiveId={objective.id}
-              onUpdateKeyResult={onUpdateKeyResult} 
-            />
-          ))}
-        </div>
-        
-        {objective.keyResults.length > 0 && (
-          <div className="mt-4">
-            <Button variant="outline" onClick={() => setShowChart(!showChart)} size="sm" className="mb-2">
-              {showChart ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-              {showChart ? 'Hide' : 'Show'} Progress Chart
-            </Button>
-            {showChart && <OkrProgressChart keyResults={objective.keyResults} objectiveTitle={objective.title} />}
-          </div>
-        )}
-
-      </CardContent>
-      {/* <CardFooter>
-        Footer content if needed
-      </CardFooter> */}
+        </CardContent>
+      )}
     </Card>
   );
 }

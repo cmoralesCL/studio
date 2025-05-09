@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Trash2, PlusCircle } from 'lucide-react';
-import type { ObjectiveFormData, TrackingFrequency } from '@/lib/types';
+import type { ObjectiveFormData, TrackingFrequency, KeyResultFormData } from '@/lib/types'; // Use ObjectiveFormData for control type
 import { FormField, FormItem, FormControl, FormMessage, FormLabel as ShadcnFormLabel } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,8 +16,8 @@ import { DatePicker } from '@/components/ui/date-picker';
 
 
 interface KeyResultInputArrayProps {
-  control: Control<ObjectiveFormData>;
-  errors: FieldErrors<ObjectiveFormData>;
+  control: Control<any>; // Using `any` due to complexity of Zod transformed type with react-hook-form
+  errors: FieldErrors<any>; // Using `any`
   trackingFrequencies: TrackingFrequency[];
 }
 
@@ -133,12 +133,68 @@ export function KeyResultInputArray({ control, errors, trackingFrequencies }: Ke
               )}
             />
           </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={control}
+              name={`keyResults.${index}.tags`}
+              render={({ field }) => (
+                <FormItem>
+                  <ShadcnFormLabel htmlFor={field.name}>Tags (comma-separated)</ShadcnFormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Product, Marketing" {...field} />
+                  </FormControl>
+                  <FormMessage>{errors.keyResults?.[index]?.tags?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={control}
+              name={`keyResults.${index}.assignees`}
+              render={({ field }) => (
+                <FormItem>
+                  <ShadcnFormLabel htmlFor={field.name}>Assignees (comma-separated names)</ShadcnFormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Alice, Bob" {...field} />
+                  </FormControl>
+                  <FormMessage>{errors.keyResults?.[index]?.assignees?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={control}
+              name={`keyResults.${index}.subTasksCompleted`}
+              render={({ field }) => (
+                <FormItem>
+                  <ShadcnFormLabel htmlFor={field.name}>Sub-tasks Completed</ShadcnFormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 2" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)} />
+                  </FormControl>
+                  <FormMessage>{errors.keyResults?.[index]?.subTasks?.completed?.message || errors.keyResults?.[index]?.subTasksCompleted?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name={`keyResults.${index}.subTasksTotal`}
+              render={({ field }) => (
+                <FormItem>
+                  <ShadcnFormLabel htmlFor={field.name}>Sub-tasks Total</ShadcnFormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="e.g., 5" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)} />
+                  </FormControl>
+                  <FormMessage>{errors.keyResults?.[index]?.subTasks?.total?.message || errors.keyResults?.[index]?.subTasksTotal?.message}</FormMessage>
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
       ))}
       <Button
         type="button"
         variant="outline"
-        onClick={() => append({ title: '', targetValue: 0, unit: '', trackingFrequency: 'once', targetDate: undefined })}
+        onClick={() => append({ title: '', targetValue: 0, unit: '', trackingFrequency: 'once', targetDate: undefined, tags: '', assignees: '', subTasksCompleted: 0, subTasksTotal: 0 })}
         className="w-full"
       >
         <PlusCircle className="mr-2 h-4 w-4" /> Add Key Result
@@ -146,6 +202,10 @@ export function KeyResultInputArray({ control, errors, trackingFrequencies }: Ke
       {errors.keyResults?.root && (
          <p className="text-sm font-medium text-destructive">{errors.keyResults.root.message}</p>
       )}
+       {errors.keyResults && !errors.keyResults.root && typeof errors.keyResults.message === 'string' && (
+        <p className="text-sm font-medium text-destructive">{errors.keyResults.message}</p>
+      )}
     </div>
   );
 }
+
