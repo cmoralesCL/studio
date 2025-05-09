@@ -65,7 +65,7 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
 
 
   return (
-    <Card className="w-full shadow-lg bg-card rounded-lg border border-border/70">
+    <Card className="w-full shadow-lg bg-lifeOkrCard rounded-lg border border-border/70">
       <CardHeader 
         className="p-4 cursor-pointer hover:bg-muted/30 transition-colors rounded-t-lg" 
         onClick={() => setIsExpanded(!isExpanded)}

@@ -13,6 +13,7 @@ body {
 
     --card: 0 0% 100%; /* White cards on light gray background */
     --card-foreground: 210 20% 20%; /* Dark text on cards */
+    --life-okr-card-background: 207 70% 97%; /* Very light blue for Life OKR cards */
 
     --popover: 0 0% 100%;
     --popover-foreground: 210 20% 20%;
@@ -70,6 +71,8 @@ body {
 
     --card: 210 15% 18%; /* Slightly lighter dark for cards */
     --card-foreground: 204 17% 95%;
+    --life-okr-card-background: 207 70% 22%; /* Darker, subtle blue for Life OKR cards */
+
 
     --popover: 210 15% 18%;
     --popover-foreground: 204 17% 95%;
