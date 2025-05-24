@@ -8,7 +8,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { AddOkrDialog } from '@/components/okr/AddOkrDialog';
 import { OkrList } from '@/components/okr/OkrList';
 import OkrOverallSummary from '@/components/okr/OkrOverallSummary';
-import { TaskColumns } from '@/components/okr/TaskColumns'; // Import new component
+import { TaskColumns } from '@/components/okr/TaskColumns';
 import { PlusCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from "@/components/ui/toaster";
@@ -30,7 +30,7 @@ const getCurrentISODate = () => new Date().toISOString();
 const getNextWeekendDateISO = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();
-  const daysUntilSunday = dayOfWeek === 0 ? 0 : (7 - dayOfWeek); // if today is Sunday, target this Sunday
+  const daysUntilSunday = dayOfWeek === 0 ? 0 : (7 - dayOfWeek); 
   const nextSunday = new Date(today);
   nextSunday.setDate(today.getDate() + daysUntilSunday);
   nextSunday.setHours(23, 59, 59, 999);
@@ -40,8 +40,12 @@ const getNextWeekendDateISO = () => {
 const getEndOfCurrentMonthISO = () => endOfMonth(new Date()).toISOString();
 const getEndOfCurrentQuarterISO = () => endOfQuarter(new Date()).toISOString();
 const getEndOfYearISO = () => endOfYear(new Date()).toISOString();
+const getTodayISO = () => startOfDay(new Date()).toISOString();
+const getTomorrowISO = () => startOfDay(addDays(new Date(), 1)).toISOString();
+const getDayAfterTomorrowISO = () => startOfDay(addDays(new Date(), 2)).toISOString();
 
-const placeholderAssignee = (seed: string) => `https://picsum.photos/seed/${seed}/40/40`;
+
+const placeholderAssignee = (seed: string) => `https://picsum.photos/seed/${seed.replace(/\s+/g, '_')}/40/40`; // Ensure seed is URL friendly
 
 const exampleLifeOkrs: LifeOkr[] = [
   {
@@ -57,9 +61,9 @@ const exampleLifeOkrs: LifeOkr[] = [
         level: "Personal",
         icon: "Activity",
         keyResults: [
-          { id: generateId(), title: "Realizar 150 minutos de ejercicio moderado por semana", currentValue: 75, targetValue: 150, unit: "minutos", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO(), tags: ["Ejercicio"], assignees: [placeholderAssignee('user1')], subTasks: { completed: 2, total: 3 } },
-          { id: generateId(), title: "Consumir 5 porciones de frutas/verduras al día (objetivo semanal: 35)", currentValue: 20, targetValue: 35, unit: "porciones/sem", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO(), tags: ["Nutrición"], assignees: [placeholderAssignee('user1')], subTasks: { completed: 4, total: 7 }},
-          { id: generateId(), title: "Dormir un promedio de 7 horas por noche", currentValue: 25*7*0.8, targetValue: 30*7, unit: "horas/mes", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Descanso"], assignees: [placeholderAssignee('user1')], subTasks: { completed: 15, total: 30 }},
+          { id: generateId(), title: "Realizar 150 minutos de ejercicio moderado por semana", currentValue: 100, targetValue: 150, unit: "minutos", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO(), tags: ["Ejercicio"], assignees: [placeholderAssignee('Ana Fisica')], subTasks: { completed: 2, total: 3 } },
+          { id: generateId(), title: "Consumir 5 porciones de frutas/verduras al día", currentValue: 28, targetValue: 35, unit: "porciones/sem", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getNextWeekendDateISO(), tags: ["Nutrición"], assignees: [placeholderAssignee('Ana Fisica')], subTasks: { completed: 4, total: 7 }},
+          { id: generateId(), title: "Dormir un promedio de 7 horas por noche este mes", currentValue: 180, targetValue: 210, unit: "horas/mes", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Descanso"], assignees: [placeholderAssignee('Ana Fisica')], subTasks: { completed: 20, total: 30 }},
         ],
       },
       {
@@ -69,9 +73,9 @@ const exampleLifeOkrs: LifeOkr[] = [
         level: "Personal",
         icon: "Smile",
         keyResults: [
-          { id: generateId(), title: "Practicar meditación 10 minutos, 5 días/semana", currentValue: 3*4, targetValue: 5*4, unit: "sesiones/mes", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Mindfulness"], assignees: [placeholderAssignee('user2')], subTasks: { completed: 12, total: 20 } },
-          { id: generateId(), title: "Dedicar 3 horas/semana a hobbies desestresantes", currentValue: 1*4, targetValue: 3*4, unit: "horas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Hobbies"], assignees: [placeholderAssignee('user2')], subTasks: { completed: 1, total: 4 }},
-          { id: generateId(), title: "Limitar exposición a noticias negativas a 30 mins/día", currentValue: 20, targetValue: 30, unit: "días cumplidos", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Bienestar Digital"], assignees: [placeholderAssignee('user2')], subTasks: { completed: 20, total: 30 }}
+          { id: generateId(), title: "Meditar 10 minutos, 5 días/semana", currentValue: 15, targetValue: 20, unit: "sesiones/mes", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Mindfulness"], assignees: [placeholderAssignee('Carlos Mental')], subTasks: { completed: 15, total: 20 } },
+          { id: generateId(), title: "Dedicar 3 horas/semana a hobbies desestresantes", currentValue: 8, targetValue: 12, unit: "horas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Hobbies"], assignees: [placeholderAssignee('Carlos Mental')], subTasks: { completed: 2, total: 4 }},
+          { id: generateId(), title: "Limitar noticias negativas a 30 mins/día (hoy)", currentValue: 1, targetValue: 1, unit: "día cumplido", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getTodayISO(), tags: ["Bienestar Digital"], assignees: [placeholderAssignee('Carlos Mental')], subTasks: { completed: 1, total: 1 }}
         ],
       },
     ],
@@ -84,14 +88,14 @@ const exampleLifeOkrs: LifeOkr[] = [
     areaOkrs: [
       {
         id: generateId(),
-        title: "Adquirir Nueva Habilidad Técnica (IA Aplicada)",
+        title: "Adquirir Habilidad en IA Aplicada",
         description: "Aprender y aplicar conocimientos en Inteligencia Artificial.",
-        level: "Individual", 
+        level: "Individual",
         icon: "Zap",
         keyResults: [
-          { id: generateId(), title: "Completar curso online avanzado de IA (10 módulos)", currentValue: 4, targetValue: 10, unit: "módulos", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["Formación", "IA"], assignees: [placeholderAssignee('user3'), placeholderAssignee('user4')], subTasks: { completed: 2, total: 5 } },
-          { id: generateId(), title: "Dedicar 8 horas/semana a estudio y práctica de IA", currentValue: 5*4, targetValue: 8*4, unit: "horas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Estudio"], assignees: [placeholderAssignee('user3')], subTasks: { completed: 0, total: 0 }},
-          { id: generateId(), title: "Desarrollar 1 proyecto práctico aplicando IA", currentValue: 0, targetValue: 1, unit: "proyecto", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["Aplicación"], assignees: [placeholderAssignee('user3')], subTasks: { completed: 0, total: 2 } },
+          { id: generateId(), title: "Completar curso online avanzado de IA", currentValue: 7, targetValue: 10, unit: "módulos", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["Formación", "IA"], assignees: [placeholderAssignee('David IA'), placeholderAssignee('Eva IA')], subTasks: { completed: 3, total: 5 } },
+          { id: generateId(), title: "Dedicar 8 horas/semana a estudio de IA (pasado mañana)", currentValue: 0, targetValue: 1, unit: "sesión de estudio", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getDayAfterTomorrowISO(), tags: ["Estudio"], assignees: [placeholderAssignee('David IA')], subTasks: { completed: 0, total: 1 }},
+          { id: generateId(), title: "Desarrollar 1 proyecto práctico con IA este trimestre", currentValue: 0, targetValue: 1, unit: "proyecto", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["Aplicación"], assignees: [placeholderAssignee('David IA')], subTasks: { completed: 0, total: 3 } },
         ],
       },
        {
@@ -101,8 +105,8 @@ const exampleLifeOkrs: LifeOkr[] = [
         level: "Individual",
         icon: "Users",
         keyResults: [
-          { id: generateId(), title: "Asistir a 1 evento de networking relevante por mes", currentValue: 1, targetValue: 3, unit: "eventos", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["Networking"], assignees: [placeholderAssignee('user3')], subTasks: { completed: 0, total: 0 } },
-          { id: generateId(), title: "Establecer 5 nuevas conexiones significativas en LinkedIn por semana", currentValue: 15, targetValue: 20, unit: "conexiones/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["LinkedIn", "Conexiones"], assignees: [placeholderAssignee('user3')], subTasks: { completed: 0, total: 0 } },
+          { id: generateId(), title: "Asistir a 1 evento de networking/mes", currentValue: 2, targetValue: 3, unit: "eventos", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["Networking"], assignees: [placeholderAssignee('Laura Red')]},
+          { id: generateId(), title: "5 nuevas conexiones LinkedIn/semana (mañana)", currentValue: 0, targetValue: 1, unit: "objetivo semanal", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getTomorrowISO(), tags: ["LinkedIn"], assignees: [placeholderAssignee('Laura Red')], subTasks: { completed: 0, total: 1 } },
         ],
       },
     ],
@@ -120,9 +124,9 @@ const exampleLifeOkrs: LifeOkr[] = [
         level: "Personal",
         icon: "DollarSign",
         keyResults: [
-          { id: generateId(), title: "Ahorrar el 20% de ingresos netos mensuales", currentValue: 15, targetValue: 20, unit: "% mensual", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Ahorro"], assignees: [placeholderAssignee('user5')], subTasks: { completed: 1, total: 1 } },
-          { id: generateId(), title: "Aumentar cartera de inversión en 10% este año", currentValue: 2, targetValue: 10, unit: "% anual", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: getEndOfYearISO(), tags: ["Inversión"], assignees: [placeholderAssignee('user5'), placeholderAssignee('user1')], subTasks: { completed: 1, total: 4 } },
-          { id: generateId(), title: "Crear un fondo de emergencia de 3 meses de gastos", currentValue: 1, targetValue: 3, unit: "meses", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfYearISO(), tags: ["Emergencia"], assignees: [placeholderAssignee('user5')], subTasks: { completed: 0, total: 0 } },
+          { id: generateId(), title: "Ahorrar el 20% de ingresos netos mensuales", currentValue: 18, targetValue: 20, unit: "% mensual", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Ahorro"], assignees: [placeholderAssignee('Sofia Finanzas')], subTasks: { completed: 1, total: 1 } },
+          { id: generateId(), title: "Aumentar cartera de inversión en 10% este año", currentValue: 3, targetValue: 10, unit: "% anual", trackingFrequency: "annually", lastUpdated: getCurrentISODate(), targetDate: getEndOfYearISO(), tags: ["Inversión"], assignees: [placeholderAssignee('Sofia Finanzas'), placeholderAssignee('Ana Fisica')], subTasks: { completed: 1, total: 4 } },
+          { id: generateId(), title: "Fondo de emergencia de 3 meses de gastos (hoy)", currentValue: 2.5, targetValue: 3, unit: "meses", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: getTodayISO(), tags: ["Emergencia"], assignees: [placeholderAssignee('Sofia Finanzas')], subTasks: { completed: 2, total: 3 } },
         ],
       },
       {
@@ -132,8 +136,8 @@ const exampleLifeOkrs: LifeOkr[] = [
         level: "Personal",
         icon: "Home",
         keyResults: [
-            { id: generateId(), title: "Reducir gastos discrecionales en un 10% mensual", currentValue: 5, targetValue: 10, unit: "% mensual", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Presupuesto", "Ahorro"], assignees: [placeholderAssignee('user5')], subTasks: {completed: 0, total: 0}},
-            { id: generateId(), title: "Realizar seguimiento semanal de gastos y compararlo con el presupuesto", currentValue: 2, targetValue: 4, unit: "revisiones/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Control", "Presupuesto"], assignees: [placeholderAssignee('user5')], subTasks: {completed: 0, total: 0}},
+            { id: generateId(), title: "Reducir gastos discrecionales en 10% mensual", currentValue: 7, targetValue: 10, unit: "% mensual", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Presupuesto"], assignees: [placeholderAssignee('Sofia Finanzas')]},
+            { id: generateId(), title: "Revisión semanal de gastos vs presupuesto (pasado mañana)", currentValue: 0, targetValue: 1, unit: "revisión", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getDayAfterTomorrowISO(), tags: ["Control"], assignees: [placeholderAssignee('Sofia Finanzas')]},
         ]
       }
     ],
@@ -149,11 +153,22 @@ const exampleLifeOkrs: LifeOkr[] = [
         title: "Dominar un Nuevo Idioma (Inglés B2)",
         description: "Alcanzar un nivel intermedio-alto en inglés.",
         level: "Personal",
-        icon: "Zap", 
+        icon: "Zap",
         keyResults: [
-          { id: generateId(), title: "Dedicar 5 horas/semana al estudio del idioma", currentValue: 3*4, targetValue: 5*4, unit: "horas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Idioma", "Estudio"], assignees: [placeholderAssignee('user6')], subTasks: { completed: 0, total: 0 } },
-          { id: generateId(), title: "Completar 2 niveles de una app de idiomas", currentValue: 0, targetValue: 2, unit: "niveles", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["App", "Progreso"], assignees: [placeholderAssignee('user6')], subTasks: { completed: 0, total: 0 } },
-          { id: generateId(), title: "Mantener 1 conversación de 30 mins en inglés por semana", currentValue: 1, targetValue: 4, unit: "conversaciones/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Práctica", "Conversación"], assignees: [placeholderAssignee('user6')], subTasks: { completed: 0, total: 0 } },
+          { id: generateId(), title: "Dedicar 5 horas/semana al estudio del idioma", currentValue: 15, targetValue: 20, unit: "horas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Idioma", "Estudio"], assignees: [placeholderAssignee('Miguel Idioma')]},
+          { id: generateId(), title: "Completar 2 niveles de app de idiomas este trimestre", currentValue: 1, targetValue: 2, unit: "niveles", trackingFrequency: "quarterly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["App", "Progreso"], assignees: [placeholderAssignee('Miguel Idioma')]},
+          { id: generateId(), title: "Conversación de 30 mins en inglés/semana (mañana)", currentValue: 0, targetValue: 1, unit: "conversación", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getTomorrowISO(), tags: ["Práctica"], assignees: [placeholderAssignee('Miguel Idioma')]},
+        ]
+      },
+      {
+        id: generateId(),
+        title: "Leer 12 Libros este Año",
+        description: "Expandir cultura general y conocimientos diversos.",
+        level: "Personal",
+        icon: "Brain",
+        keyResults: [
+          { id: generateId(), title: "Leer un libro por mes", currentValue: 4, targetValue: 12, unit: "libros", trackingFrequency: "annually", lastUpdated: getCurrentISODate(), targetDate: getEndOfYearISO(), tags: ["Lectura", "Cultura"], assignees: [placeholderAssignee('Sara Libros')]},
+          { id: generateId(), title: "Dedicar 30 minutos a la lectura diaria (hoy)", currentValue: 1, targetValue: 1, unit: "día cumplido", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getTodayISO(), tags: ["Hábito"], assignees: [placeholderAssignee('Sara Libros')]},
         ]
       }
     ]
@@ -171,18 +186,19 @@ const exampleLifeOkrs: LifeOkr[] = [
             level: "Personal",
             icon: "Heart",
             keyResults: [
-                { id: generateId(), title: "Tener 1 cena/actividad familiar de calidad por semana", currentValue: 2, targetValue: 4, unit: "actividades/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Familia"], assignees: [placeholderAssignee('user7')], subTasks: { completed: 0, total: 0 }},
-                { id: generateId(), title: "Contactar proactivamente a 2 amigos por semana para conversar", currentValue: 5, targetValue: 8, unit: "contactos/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Amistad"], assignees: [placeholderAssignee('user7')], subTasks: { completed: 0, total: 0 }},
+                { id: generateId(), title: "Actividad familiar de calidad/semana", currentValue: 3, targetValue: 4, unit: "actividades/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Familia"], assignees: [placeholderAssignee('Pedro Relaciones')]},
+                { id: generateId(), title: "Contactar 2 amigos/semana (mañana)", currentValue: 0, targetValue: 1, unit: "objetivo semanal", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getTomorrowISO(), tags: ["Amistad"], assignees: [placeholderAssignee('Pedro Relaciones')]},
             ]
         },
         {
             id: generateId(),
             title: "Contribuir a la Comunidad Local",
             description: "Participar en iniciativas que mejoren el entorno.",
-            level: "Personal", 
-            icon: "Award", 
+            level: "Personal",
+            icon: "Award",
             keyResults: [
-                { id: generateId(), title: "Dedicar 4 horas al mes a voluntariado", currentValue: 2, targetValue: 4, unit: "horas/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Voluntariado"], assignees: [placeholderAssignee('user8')], subTasks: { completed: 0, total: 0 }},
+                { id: generateId(), title: "Dedicar 4 horas al mes a voluntariado", currentValue: 2, targetValue: 4, unit: "horas/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Voluntariado"], assignees: [placeholderAssignee('Isabel Comunidad')]},
+                { id: generateId(), title: "Participar en 1 limpieza de parque (pasado mañana)", currentValue: 0, targetValue: 1, unit: "evento", trackingFrequency: "once", lastUpdated: getCurrentISODate(), targetDate: getDayAfterTomorrowISO(), tags: ["Comunidad"], assignees: [placeholderAssignee('Isabel Comunidad')]},
             ]
         }
     ]
@@ -274,7 +290,7 @@ export default function OkrTrackerPage() {
             };
 
 
-            if (kr.targetDate && cappedProgress < 100) { // Only consider incomplete KRs for task lists and deadlines
+            if (kr.targetDate && cappedProgress < 100) { 
               const krDate = startOfDay(new Date(kr.targetDate));
               if (!earliestTargetDate || krDate < earliestTargetDate) {
                 earliestTargetDate = krDate;
@@ -400,7 +416,7 @@ export default function OkrTrackerPage() {
 
   const handleAddLifeOkr = async (data: LifeOkrFormData) => {
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500)); 
 
     const newLifeOkr: LifeOkr = {
       id: generateId(),
@@ -482,7 +498,18 @@ export default function OkrTrackerPage() {
   };
   
   const handleEditLifeOkr = (lifeOkr: LifeOkr) => {
-    toast({ title: "Edit Action (Placeholder)", description: `Editing Life OKR: ${lifeOkr.title} (not fully implemented yet)`});
+    toast({ title: "Edit Action (Life OKR)", description: `Editing Life OKR: ${lifeOkr.title} (not fully implemented yet)`});
+  };
+
+  const handleEditAreaOkr = (areaOkr: AreaOkr, lifeOkrId: string) => {
+    const lifeOkr = lifeOkrs.find(lo => lo.id === lifeOkrId);
+    toast({ title: "Edit Action (Area OKR)", description: `Editing Area OKR: "${areaOkr.title}" under Life OKR: "${lifeOkr?.title}" (not fully implemented yet)`});
+  };
+
+  const handleEditKeyResult = (keyResult: KeyResult, areaOkrId: string, lifeOkrId: string) => {
+     const lifeOkr = lifeOkrs.find(lo => lo.id === lifeOkrId);
+     const areaOkr = lifeOkr?.areaOkrs.find(ao => ao.id === areaOkrId);
+    toast({ title: "Edit Action (Key Result)", description: `Editing Key Result: "${keyResult.title}" under Area OKR: "${areaOkr?.title}" (not fully implemented yet)`});
   };
 
 
@@ -525,6 +552,8 @@ export default function OkrTrackerPage() {
           onUpdateKeyResult={handleUpdateKeyResult} 
           onDeleteLifeOkr={confirmDeleteLifeOkr}
           onEditLifeOkr={handleEditLifeOkr}
+          onEditAreaOkr={handleEditAreaOkr}
+          onEditKeyResult={handleEditKeyResult}
         />
         
         <AddOkrDialog

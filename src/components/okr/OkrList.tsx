@@ -1,23 +1,26 @@
+
 'use client';
 
 import React from 'react';
-import type { LifeOkr } from '@/lib/types'; // Updated to LifeOkr
+import type { LifeOkr, AreaOkr, KeyResult } from '@/lib/types'; // Updated to LifeOkr
 import { OkrCard } from './OkrCard';
 
 
 interface OkrListProps {
-  lifeOkrs: LifeOkr[]; // Changed from objectives to lifeOkrs
-  onUpdateKeyResult: (lifeOkrId: string, areaOkrId: string, krId: string, newCurrentValue: number) => void; // Updated signature
-  onDeleteLifeOkr: (lifeOkrId: string) => void; // Changed from onDeleteObjective
-  onEditLifeOkr: (lifeOkr: LifeOkr) => void; // Changed from onEditObjective
+  lifeOkrs: LifeOkr[];
+  onUpdateKeyResult: (lifeOkrId: string, areaOkrId: string, krId: string, newCurrentValue: number) => void;
+  onDeleteLifeOkr: (lifeOkrId: string) => void;
+  onEditLifeOkr: (lifeOkr: LifeOkr) => void;
+  onEditAreaOkr: (areaOkr: AreaOkr, lifeOkrId: string) => void;
+  onEditKeyResult: (keyResult: KeyResult, areaOkrId: string, lifeOkrId: string) => void;
 }
 
-export function OkrList({ lifeOkrs, onUpdateKeyResult, onDeleteLifeOkr, onEditLifeOkr }: OkrListProps) {
+export function OkrList({ lifeOkrs, onUpdateKeyResult, onDeleteLifeOkr, onEditLifeOkr, onEditAreaOkr, onEditKeyResult }: OkrListProps) {
   if (lifeOkrs.length === 0) {
     return (
       <div className="text-center py-10">
         <img 
-          src="https://picsum.photos/seed/emptyOKR/300/200" 
+          src="https://placehold.co/300x200.png" 
           alt="No OKRs yet" 
           className="mx-auto mb-4 rounded-md shadow-md" 
           data-ai-hint="empty state illustration"
@@ -32,13 +35,15 @@ export function OkrList({ lifeOkrs, onUpdateKeyResult, onDeleteLifeOkr, onEditLi
 
   return (
     <div className="space-y-6">
-      {lifeOkrs.map(lifeOkr => ( // Changed from objective to lifeOkr
+      {lifeOkrs.map(lifeOkr => ( 
         <OkrCard 
           key={lifeOkr.id} 
-          lifeOkr={lifeOkr} // Pass lifeOkr
+          lifeOkr={lifeOkr} 
           onUpdateKeyResult={onUpdateKeyResult}
-          onDeleteLifeOkr={onDeleteLifeOkr} // Pass renamed prop
-          onEditLifeOkr={onEditLifeOkr} // Pass renamed prop
+          onDeleteLifeOkr={onDeleteLifeOkr} 
+          onEditLifeOkr={onEditLifeOkr} 
+          onEditAreaOkr={onEditAreaOkr}
+          onEditKeyResult={onEditKeyResult}
         />
       ))}
     </div>

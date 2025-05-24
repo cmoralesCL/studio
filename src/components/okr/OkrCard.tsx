@@ -2,11 +2,11 @@
 'use client';
 
 import React from 'react';
-import type { LifeOkr, OkrIcon } from '@/lib/types';
+import type { LifeOkr, AreaOkr, KeyResult, OkrIcon } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AreaOkrItem } from './AreaOkrItem'; // New component for displaying Area OKRs
-import { Progress } from '@/components/ui/progress'; // Import Progress
+import { AreaOkrItem } from './AreaOkrItem';
+import { Progress } from '@/components/ui/progress';
 import { 
   Trash2, 
   Edit, 
@@ -28,33 +28,36 @@ import {
   TrendingUp,
   ShieldCheck,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  CheckCircle2 // Added CheckCircle2 import
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface OkrCardProps { // Represents a LifeOkr card
+interface OkrCardProps {
   lifeOkr: LifeOkr;
   onUpdateKeyResult: (lifeOkrId: string, areaOkrId: string, krId: string, newCurrentValue: number) => void;
   onDeleteLifeOkr: (lifeOkrId: string) => void;
-  onEditLifeOkr: (lifeOkr: LifeOkr) => void; 
+  onEditLifeOkr: (lifeOkr: LifeOkr) => void;
+  onEditAreaOkr: (areaOkr: AreaOkr, lifeOkrId: string) => void;
+  onEditKeyResult: (keyResult: KeyResult, areaOkrId: string, lifeOkrId: string) => void;
 }
 
 const iconMap: Record<OkrIcon, React.ElementType> = {
-  Heart, Zap, Target: TargetIcon, Briefcase, Activity, Landmark, Users, Award, FolderArchive, Smile, BookOpen, DollarSign, Home, UsersRound, Brain, TrendingUp, ShieldCheck
+  Heart, Zap, Target: TargetIcon, Briefcase, Activity, Landmark, Users, Award, FolderArchive, Smile, BookOpen, DollarSign, Home, UsersRound, Brain, TrendingUp, ShieldCheck, CheckCircle2, AlertTriangle: ShieldCheck, CalendarClock: ShieldCheck, ListTodo: ShieldCheck
 };
 
 const getProgressColorStyle = (percentage: number) => {
   if (percentage >= 75) return 'progress-indicator-success';
   if (percentage >= 40) return 'progress-indicator-warning';
   if (percentage < 20 && percentage > 0) return 'progress-indicator-danger';
-  if (percentage <= 0) return 'progress-indicator-default'; // Use default for 0 or less
-  return 'progress-indicator-primary'; // Default for mid-range
+  if (percentage <= 0) return 'progress-indicator-default';
+  return 'progress-indicator-primary';
 };
 
 
-export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLifeOkr }: OkrCardProps) {
+export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLifeOkr, onEditAreaOkr, onEditKeyResult }: OkrCardProps) {
   const [isExpanded, setIsExpanded] = React.useState(true);
-  const LifeOkrIconComponent = lifeOkr.icon ? iconMap[lifeOkr.icon] : TargetIcon;
+  const LifeOkrIconComponent = lifeOkr.icon && iconMap[lifeOkr.icon] ? iconMap[lifeOkr.icon] : TargetIcon;
 
   let totalAreaOkrProgress = 0;
   let numAreaOkrsWithKrs = 0;
@@ -82,7 +85,7 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <LifeOkrIconComponent className={cn("h-6 w-6 mr-3 text-primary", 
-              lifeOkr.icon && iconMap[lifeOkr.icon] ? `text-${lifeOkr.icon.toLowerCase()}-500` : 'text-primary' // Example dynamic coloring
+              lifeOkr.icon && iconMap[lifeOkr.icon] ? `text-${lifeOkr.icon.toLowerCase()}-500` : 'text-primary' 
             )} />
             <div className="flex flex-col">
               <CardTitle className="text-xl font-semibold text-foreground">
@@ -95,14 +98,14 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
               )}
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-             <div className="flex flex-col items-end w-28"> {/* Container for text and progress bar */}
+          <div className="flex items-center space-x-1.5">
+             <div className="flex flex-col items-end w-28">
                 <span className="text-sm font-medium text-muted-foreground">
                 {lifeOkrOverallProgress.toFixed(0)}%
                 </span>
                 <Progress value={lifeOkrOverallProgress} className="h-1.5 mt-1 w-full" indicatorClassName={progressColorClass} />
             </div>
-            {/* <Button 
+            <Button 
               variant="ghost" 
               size="icon" 
               onClick={(e) => { e.stopPropagation(); onEditLifeOkr(lifeOkr);}} 
@@ -110,7 +113,7 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
               className="h-7 w-7 text-muted-foreground hover:text-foreground"
             >
               <Edit className="h-4 w-4" />
-            </Button> */}
+            </Button>
             <Button 
               variant="ghost" 
               size="icon" 
@@ -136,6 +139,8 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
                   lifeOkrId={lifeOkr.id} 
                   onUpdateKeyResult={onUpdateKeyResult}
                   iconMap={iconMap} 
+                  onEditAreaOkr={onEditAreaOkr}
+                  onEditKeyResult={onEditKeyResult}
                 />
               ))}
             </div>
@@ -147,4 +152,3 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
     </Card>
   );
 }
-
