@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -5,6 +6,7 @@ import type { LifeOkr, OkrIcon } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AreaOkrItem } from './AreaOkrItem'; // New component for displaying Area OKRs
+import { Progress } from '@/components/ui/progress'; // Import Progress
 import { 
   Trash2, 
   Edit, 
@@ -41,12 +43,19 @@ const iconMap: Record<OkrIcon, React.ElementType> = {
   Heart, Zap, Target: TargetIcon, Briefcase, Activity, Landmark, Users, Award, FolderArchive, Smile, BookOpen, DollarSign, Home, UsersRound, Brain, TrendingUp, ShieldCheck
 };
 
+const getProgressColorStyle = (percentage: number) => {
+  if (percentage >= 75) return 'progress-indicator-success';
+  if (percentage >= 40) return 'progress-indicator-warning';
+  if (percentage < 20 && percentage > 0) return 'progress-indicator-danger';
+  if (percentage <= 0) return 'progress-indicator-default'; // Use default for 0 or less
+  return 'progress-indicator-primary'; // Default for mid-range
+};
+
+
 export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLifeOkr }: OkrCardProps) {
   const [isExpanded, setIsExpanded] = React.useState(true);
   const LifeOkrIconComponent = lifeOkr.icon ? iconMap[lifeOkr.icon] : TargetIcon;
 
-  // Calculate overall progress for the LifeOkr (average of its AreaOkrs' average progresses)
-  // This is a simplified calculation for display. A more robust one might weight AreaOkrs.
   let totalAreaOkrProgress = 0;
   let numAreaOkrsWithKrs = 0;
 
@@ -62,7 +71,7 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
     }
   });
   const lifeOkrOverallProgress = numAreaOkrsWithKrs > 0 ? (totalAreaOkrProgress / numAreaOkrsWithKrs) : 0;
-
+  const progressColorClass = getProgressColorStyle(lifeOkrOverallProgress);
 
   return (
     <Card className="w-full shadow-lg bg-lifeOkrCard rounded-lg border border-border/70">
@@ -87,9 +96,12 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
             </div>
           </div>
           <div className="flex items-center space-x-2">
-             <span className="text-sm font-medium text-muted-foreground mr-2">
-              {lifeOkrOverallProgress.toFixed(0)}%
-            </span>
+             <div className="flex flex-col items-end w-28"> {/* Container for text and progress bar */}
+                <span className="text-sm font-medium text-muted-foreground">
+                {lifeOkrOverallProgress.toFixed(0)}%
+                </span>
+                <Progress value={lifeOkrOverallProgress} className="h-1.5 mt-1 w-full" indicatorClassName={progressColorClass} />
+            </div>
             {/* <Button 
               variant="ghost" 
               size="icon" 
@@ -121,9 +133,9 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
                 <AreaOkrItem 
                   key={areaOkr.id}
                   areaOkr={areaOkr}
-                  lifeOkrId={lifeOkr.id} // Pass LifeOkrId for context if needed for updates
+                  lifeOkrId={lifeOkr.id} 
                   onUpdateKeyResult={onUpdateKeyResult}
-                  iconMap={iconMap} // Pass down the iconMap
+                  iconMap={iconMap} 
                 />
               ))}
             </div>
@@ -135,3 +147,4 @@ export function OkrCard({ lifeOkr, onUpdateKeyResult, onDeleteLifeOkr, onEditLif
     </Card>
   );
 }
+
