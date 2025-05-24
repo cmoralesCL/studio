@@ -17,7 +17,11 @@ export type OkrIcon =
   | 'Home'        // Home life, personal projects
   | 'Brain'       // Mental acuity, learning new skills
   | 'TrendingUp'  // Growth, improvement
-  | 'ShieldCheck'; // Security, safety
+  | 'ShieldCheck' // Security, safety
+  | 'CheckCircle2' // For completed items
+  | 'AlertTriangle' // For warnings or at-risk items
+  | 'CalendarClock' // For deadlines
+  | 'ListTodo';     // For tasks due soon
 
 
 export interface KeyResult { // Represents a Habit OKR
@@ -86,13 +90,31 @@ export interface LifeOkrFormData { // Was ObjectiveFormData
   areaOkrs: AreaOkrFormData[];
 }
 
+// New types for enhanced OkrOverallSummary
+export type SummaryItemVariant = 'default' | 'success' | 'warning' | 'danger' | 'primary' | 'accent' | 'muted';
+
+export interface SummaryItem {
+  id: string;
+  label: string;
+  value: string | number;
+  unit?: string;
+  variant?: SummaryItemVariant;
+  icon?: OkrIcon; 
+}
 
 export interface SummaryCardData {
   id: string;
   title: string;
-  value: string | number;
-  unit?: string;
-  progress?: number;
-  variant: 'default' | 'primary' | 'accent' | 'warning' | 'destructive';
-  type: 'circular-progress' | 'text-value' | 'fraction';
+  type: 'circular-progress' | 'detailed-list';
+  // Overall card theme/accent - might be used for title color or a subtle border/background hint
+  cardVariant?: 'default' | 'primary' | 'accent' | 'warning' | 'destructive'; 
+
+  // For circular-progress
+  progressValue?: number; // The number shown in the middle (e.g., 75)
+  progressPercent?: number; // The actual progress for the bar (0-100) (e.g. 75 for 75%)
+  progressUnit?: string; // e.g., "%" or "KRs"
+  progressVariant?: SummaryItemVariant; // Variant for the progress bar color and text color of progressValue
+
+  // For detailed-list
+  items?: SummaryItem[];
 }

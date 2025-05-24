@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type { LifeOkr, AreaOkr, KeyResult, LifeOkrFormData, AreaOkrLevel, OkrIcon, SummaryCardData } from '@/lib/types';
+import type { LifeOkr, AreaOkr, KeyResult, LifeOkrFormData, AreaOkrLevel, OkrIcon, SummaryCardData, SummaryItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { AddOkrDialog } from '@/components/okr/AddOkrDialog';
@@ -20,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { addDays, endOfYear, formatISO, endOfMonth, endOfQuarter, differenceInDays } from 'date-fns';
+import { addDays, endOfYear, formatISO, endOfMonth, endOfQuarter, differenceInDays, isWithinInterval, startOfDay } from 'date-fns';
 
 const generateId = () => crypto.randomUUID();
 const getCurrentISODate = () => new Date().toISOString();
@@ -205,16 +205,15 @@ export default function OkrTrackerPage() {
     if (storedLifeOkrs && storedLifeOkrs !== '[]') {
       try {
         const parsedLifeOkrs: LifeOkr[] = JSON.parse(storedLifeOkrs);
-        // Add more robust validation if needed
         if (Array.isArray(parsedLifeOkrs) && parsedLifeOkrs.every(lo => lo.id && lo.title && Array.isArray(lo.areaOkrs))) {
             loadedLifeOkrs = parsedLifeOkrs;
         } else {
             console.warn("Stored Life OKRs are not in the expected format. Loading example OKRs.");
-            localStorage.setItem('okrLifeOkrs', JSON.stringify(exampleLifeOkrs)); // Store valid examples
+            localStorage.setItem('okrLifeOkrs', JSON.stringify(exampleLifeOkrs));
         }
       } catch (error) {
         console.error("Failed to parse Life OKRs from localStorage", error);
-        localStorage.setItem('okrLifeOkrs', JSON.stringify(exampleLifeOkrs)); // Store valid examples on error
+        localStorage.setItem('okrLifeOkrs', JSON.stringify(exampleLifeOkrs));
       }
     }
     setLifeOkrs(loadedLifeOkrs);
@@ -226,23 +225,43 @@ export default function OkrTrackerPage() {
 
       let totalKRs = 0;
       let completedKRs = 0;
+      let onTrackKRs = 0;
+      let atRiskKRs = 0;
       let totalProgressSum = 0;
       let krsWithProgress = 0;
       let earliestTargetDate: Date | null = null;
-      let activeLifeOkrs = lifeOkrs.length; // Assuming all loaded LifeOkrs are active for now
+      let krsDueSoonCount = 0;
+      const today = startOfDay(new Date());
+      const sevenDaysFromNow = addDays(today, 7);
 
       lifeOkrs.forEach(lifeOkr => {
         lifeOkr.areaOkrs.forEach(areaOkr => {
           areaOkr.keyResults.forEach(kr => {
             totalKRs++;
             const progress = kr.targetValue > 0 ? (kr.currentValue / kr.targetValue) * 100 : (kr.currentValue > 0 ? 100 : 0);
-            if (progress >= 100) completedKRs++;
-            totalProgressSum += Math.min(100, Math.max(0, progress)); // Cap progress at 100 and ensure non-negative
-            krsWithProgress++;
+            const cappedProgress = Math.min(100, Math.max(0, progress));
+
+            if (cappedProgress >= 100) {
+              completedKRs++;
+            } else if (cappedProgress >= 70) {
+              onTrackKRs++;
+            } else if (cappedProgress < 40) {
+              atRiskKRs++;
+            }
+            // For overall average, use capped progress
+            totalProgressSum += cappedProgress;
+            if (kr.targetValue > 0 || kr.currentValue > 0) { // Count KR if it has a target or some progress
+                 krsWithProgress++;
+            }
+
+
             if (kr.targetDate) {
-              const date = new Date(kr.targetDate);
-              if (!earliestTargetDate || date < earliestTargetDate) {
-                earliestTargetDate = date;
+              const krDate = startOfDay(new Date(kr.targetDate));
+              if (!earliestTargetDate || krDate < earliestTargetDate) {
+                earliestTargetDate = krDate;
+              }
+              if (cappedProgress < 100 && isWithinInterval(krDate, { start: today, end: sevenDaysFromNow })) {
+                krsDueSoonCount++;
               }
             }
           });
@@ -250,25 +269,97 @@ export default function OkrTrackerPage() {
       });
 
       const overallAvgProgress = krsWithProgress > 0 ? totalProgressSum / krsWithProgress : 0;
-      const daysLeft = earliestTargetDate ? differenceInDays(earliestTargetDate, new Date()) : null;
+      const daysLeftToNextDeadline = earliestTargetDate ? differenceInDays(earliestTargetDate, today) : null;
       
-      const objectivesCount = lifeOkrs.reduce((acc, lo) => acc + lo.areaOkrs.length, 0);
+      const activeLifeOkrsCount = lifeOkrs.length;
+      const activeAreaOkrsCount = lifeOkrs.reduce((acc, lo) => acc + lo.areaOkrs.length, 0);
+      
+      const objectivesOverviewItems: SummaryItem[] = [
+        { id: 'loCount', label: 'Life OKRs Active', value: activeLifeOkrsCount, icon: 'Heart', variant: 'primary' },
+        { id: 'aoCount', label: 'Area Objectives Active', value: activeAreaOkrsCount, icon: 'Target', variant: 'primary' },
+      ];
 
+      const krStatusItems: SummaryItem[] = [
+        { id: 'krsDone', label: 'Completed', value: `${completedKRs}/${totalKRs}`, icon: 'CheckCircle2', variant: 'success' },
+        { id: 'krsOnTrack', label: 'On Track (>=70%)', value: onTrackKRs, unit: 'KRs', icon: 'TrendingUp', variant: 'accent' },
+        { id: 'krsAtRisk', label: 'At Risk (<40%)', value: atRiskKRs, unit: 'KRs', icon: 'AlertTriangle', variant: 'danger' },
+      ];
+      
+      let deadlineText: string | number = 'N/A';
+      let deadlineUnit: string | undefined = '';
+      let deadlineVariant: SummaryCardData['cardVariant'] = 'default';
+
+      if (daysLeftToNextDeadline !== null) {
+        if (daysLeftToNextDeadline < 0) {
+          deadlineText = `${Math.abs(daysLeftToNextDeadline)}`;
+          deadlineUnit = `days overdue`;
+          deadlineVariant = 'destructive';
+        } else if (daysLeftToNextDeadline === 0) {
+          deadlineText = 'Today';
+          deadlineVariant = 'warning';
+        } else {
+          deadlineText = daysLeftToNextDeadline;
+          deadlineUnit = daysLeftToNextDeadline === 1 ? 'day left' : 'days left';
+          deadlineVariant = daysLeftToNextDeadline < 7 ? 'warning' : 'default';
+        }
+      }
+
+      const upcomingFocusItems: SummaryItem[] = [
+        { id: 'deadline', label: 'Next Deadline', value: deadlineText, unit: deadlineUnit, icon: 'CalendarClock', variant: deadlineVariant === 'destructive' ? 'danger' : deadlineVariant === 'warning' ? 'warning' : 'default' },
+        { id: 'dueSoon', label: 'KRs Due (7 days)', value: krsDueSoonCount, unit: 'KRs', icon: 'ListTodo', variant: krsDueSoonCount > 0 ? 'warning' : 'default' },
+      ];
 
       setSummaryStats([
-        { id: 's1', title: 'Overall Progress', value: overallAvgProgress, unit: '%', progress: overallAvgProgress, variant: 'primary', type: 'circular-progress' },
-        { id: 's2', title: 'Area Objectives', value: objectivesCount, unit: 'Active', variant: 'default', type: 'text-value' },
-        { id: 's3', title: 'Habit OKRs Done', value: `${completedKRs}/${totalKRs}`, variant: 'accent', type: 'fraction' },
-        { id: 's4', title: 'Next Deadline', value: daysLeft !== null && daysLeft >=0 ? daysLeft : 'N/A', unit: daysLeft !== null && daysLeft >=0 ? 'days left' : '', variant: daysLeft !==null && daysLeft < 7 && daysLeft >=0 ? 'warning' : 'default', type: 'text-value' },
+        { 
+          id: 's1', 
+          title: 'Overall Progress', 
+          type: 'circular-progress', 
+          progressValue: parseFloat(overallAvgProgress.toFixed(0)), 
+          progressPercent: overallAvgProgress,
+          progressUnit: '%',
+          progressVariant: overallAvgProgress >= 70 ? 'success' : overallAvgProgress >= 40 ? 'warning' : 'danger',
+          cardVariant: 'primary'
+        },
+        { 
+          id: 's2', 
+          title: 'Objectives Overview', 
+          type: 'detailed-list', 
+          items: objectivesOverviewItems,
+          cardVariant: 'default' 
+        },
+        { 
+          id: 's3', 
+          title: 'Key Results Status', 
+          type: 'detailed-list', 
+          items: krStatusItems,
+          cardVariant: 'default' 
+        },
+        { 
+          id: 's4', 
+          title: 'Upcoming Focus', 
+          type: 'detailed-list', 
+          items: upcomingFocusItems,
+          cardVariant: 'default'
+        },
       ]);
 
     } else if (isClient && lifeOkrs.length === 0) {
       localStorage.removeItem('okrLifeOkrs');
-      setSummaryStats([
-        { id: 's1', title: 'Overall Progress', value: 0, unit: '%', progress: 0, variant: 'primary', type: 'circular-progress' },
-        { id: 's2', title: 'Area Objectives', value: 0, unit: 'Active', variant: 'default', type: 'text-value' },
-        { id: 's3', title: 'Habit OKRs Done', value: `0/0`, variant: 'accent', type: 'fraction' },
-        { id: 's4', title: 'Next Deadline', value: 'N/A', unit: '', variant: 'default', type: 'text-value' },
+       setSummaryStats([
+        { id: 's1', title: 'Overall Progress', type: 'circular-progress', progressValue: 0, progressPercent: 0, progressUnit: '%', progressVariant: 'default', cardVariant: 'primary' },
+        { id: 's2', title: 'Objectives Overview', type: 'detailed-list', items: [
+            { id: 'loCountEmpty', label: 'Life OKRs Active', value: 0, icon: 'Heart', variant: 'muted'},
+            { id: 'aoCountEmpty', label: 'Area Objectives Active', value: 0, icon: 'Target', variant: 'muted'},
+        ], cardVariant: 'default' },
+        { id: 's3', title: 'Key Results Status', type: 'detailed-list', items: [
+            { id: 'krsDoneEmpty', label: 'Completed', value: '0/0', icon: 'CheckCircle2', variant: 'muted'},
+            { id: 'krsOnTrackEmpty', label: 'On Track', value: 0, unit: 'KRs', icon: 'TrendingUp', variant: 'muted'},
+            { id: 'krsAtRiskEmpty', label: 'At Risk', value: 0, unit: 'KRs', icon: 'AlertTriangle', variant: 'muted'},
+        ], cardVariant: 'default' },
+        { id: 's4', title: 'Upcoming Focus', type: 'detailed-list', items: [
+            { id: 'deadlineEmpty', label: 'Next Deadline', value: 'N/A', icon: 'CalendarClock', variant: 'muted'},
+            { id: 'dueSoonEmpty', label: 'KRs Due (7 days)', value: 0, unit: 'KRs', icon: 'ListTodo', variant: 'muted'},
+        ], cardVariant: 'default' },
       ]);
     }
   }, [lifeOkrs, isClient]);
