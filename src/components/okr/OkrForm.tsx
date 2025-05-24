@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel as ShadcnFormLabel, FormMessage } from '@/components/ui/form'; // Renamed FormLabel to ShadcnFormLabel to avoid conflict
+import { Label } from '@/components/ui/label'; // Added import for Label
 import type { LifeOkr, LifeOkrFormData, AreaOkrFormData, KeyResultFormData, AreaOkrLevel, TrackingFrequency, OkrIcon } from '@/lib/types';
 import { KeyResultInputArray } from './KeyResultInputArray'; 
 import { AiSuggestKeyResults } from './AiSuggestKeyResults';
@@ -162,7 +163,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg">Life OKR Title</FormLabel>
+                  <ShadcnFormLabel className="text-lg">Life OKR Title</ShadcnFormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Achieve Holistic Well-being" {...field} />
                   </FormControl>
@@ -176,7 +177,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Life OKR Description (Optional)</FormLabel>
+                  <ShadcnFormLabel>Life OKR Description (Optional)</ShadcnFormLabel>
                   <FormControl>
                     <Textarea placeholder="Briefly describe this life domain" {...field} />
                   </FormControl>
@@ -189,7 +190,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
                 name="icon"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Life OKR Icon</FormLabel>
+                    <ShadcnFormLabel>Life OKR Icon</ShadcnFormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -230,7 +231,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
                     name={`areaOkrs.${areaIndex}.title`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Title</FormLabel>
+                        <ShadcnFormLabel>Title</ShadcnFormLabel>
                         <FormControl><Input placeholder="e.g., Improve Physical Fitness" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
@@ -241,7 +242,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
                     name={`areaOkrs.${areaIndex}.description`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description (Optional)</FormLabel>
+                        <ShadcnFormLabel>Description (Optional)</ShadcnFormLabel>
                         <FormControl><Textarea placeholder="Describe this area objective" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
@@ -253,7 +254,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
                       name={`areaOkrs.${areaIndex}.level`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Level</FormLabel>
+                          <ShadcnFormLabel>Level</ShadcnFormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Select level" /></SelectTrigger></FormControl>
                             <SelectContent>{areaOkrLevels.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
@@ -267,7 +268,7 @@ export function OkrForm({ onSubmit, onCancel, initialData, isLoading }: OkrFormP
                       name={`areaOkrs.${areaIndex}.icon`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Icon</FormLabel>
+                          <ShadcnFormLabel>Icon</ShadcnFormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Select an icon" /></SelectTrigger></FormControl>
                             <SelectContent>
