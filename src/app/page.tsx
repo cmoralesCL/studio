@@ -75,7 +75,7 @@ const exampleLifeOkrs: LifeOkr[] = [
         keyResults: [
           { id: generateId(), title: "Meditar 10 minutos, 5 días/semana", currentValue: 15, targetValue: 20, unit: "sesiones/mes", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Mindfulness"], assignees: [placeholderAssignee('Carlos Mental')], subTasks: { completed: 15, total: 20 } },
           { id: generateId(), title: "Dedicar 3 horas/semana a hobbies desestresantes", currentValue: 8, targetValue: 12, unit: "horas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Hobbies"], assignees: [placeholderAssignee('Carlos Mental')], subTasks: { completed: 2, total: 4 }},
-          { id: generateId(), title: "Limitar noticias negativas a 30 mins/día (hoy)", currentValue: 1, targetValue: 1, unit: "día cumplido", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getTodayISO(), tags: ["Bienestar Digital"], assignees: [placeholderAssignee('Carlos Mental')], subTasks: { completed: 1, total: 1 }}
+          { id: generateId(), title: "Limitar noticias negativas a 30 mins/día (hoy)", currentValue: 0, targetValue: 1, unit: "día cumplido", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getTodayISO(), tags: ["Bienestar Digital"], assignees: [placeholderAssignee('Carlos Mental')], subTasks: { completed: 0, total: 1 }}
         ],
       },
     ],
@@ -168,7 +168,7 @@ const exampleLifeOkrs: LifeOkr[] = [
         icon: "Brain",
         keyResults: [
           { id: generateId(), title: "Leer un libro por mes", currentValue: 4, targetValue: 12, unit: "libros", trackingFrequency: "annually", lastUpdated: getCurrentISODate(), targetDate: getEndOfYearISO(), tags: ["Lectura", "Cultura"], assignees: [placeholderAssignee('Sara Libros')]},
-          { id: generateId(), title: "Dedicar 30 minutos a la lectura diaria (hoy)", currentValue: 1, targetValue: 1, unit: "día cumplido", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getTodayISO(), tags: ["Hábito"], assignees: [placeholderAssignee('Sara Libros')]},
+          { id: generateId(), title: "Dedicar 30 minutos a la lectura diaria (hoy)", currentValue: 0, targetValue: 1, unit: "día cumplido", trackingFrequency: "daily", lastUpdated: getCurrentISODate(), targetDate: getTodayISO(), tags: ["Hábito"], assignees: [placeholderAssignee('Sara Libros')]},
         ]
       }
     ]
