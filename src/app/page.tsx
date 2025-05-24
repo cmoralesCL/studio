@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,6 +8,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { AddOkrDialog } from '@/components/okr/AddOkrDialog';
 import { OkrList } from '@/components/okr/OkrList';
 import OkrOverallSummary from '@/components/okr/OkrOverallSummary';
+import { TaskColumns } from '@/components/okr/TaskColumns'; // Import new component
 import { PlusCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from "@/components/ui/toaster";
@@ -20,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { addDays, endOfYear, formatISO, endOfMonth, endOfQuarter, differenceInDays, isWithinInterval, startOfDay } from 'date-fns';
+import { addDays, endOfYear, formatISO, endOfMonth, endOfQuarter, differenceInDays, isWithinInterval, startOfDay, isToday, isTomorrow, isSameDay } from 'date-fns';
 
 const generateId = () => crypto.randomUUID();
 const getCurrentISODate = () => new Date().toISOString();
@@ -84,7 +86,7 @@ const exampleLifeOkrs: LifeOkr[] = [
         id: generateId(),
         title: "Adquirir Nueva Habilidad Técnica (IA Aplicada)",
         description: "Aprender y aplicar conocimientos en Inteligencia Artificial.",
-        level: "Individual", // Could be 'Personal' if for self-enrichment or 'Individual' if job-related
+        level: "Individual", 
         icon: "Zap",
         keyResults: [
           { id: generateId(), title: "Completar curso online avanzado de IA (10 módulos)", currentValue: 4, targetValue: 10, unit: "módulos", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["Formación", "IA"], assignees: [placeholderAssignee('user3'), placeholderAssignee('user4')], subTasks: { completed: 2, total: 5 } },
@@ -147,7 +149,7 @@ const exampleLifeOkrs: LifeOkr[] = [
         title: "Dominar un Nuevo Idioma (Inglés B2)",
         description: "Alcanzar un nivel intermedio-alto en inglés.",
         level: "Personal",
-        icon: "Zap", // Using Zap for the 'spark' of learning
+        icon: "Zap", 
         keyResults: [
           { id: generateId(), title: "Dedicar 5 horas/semana al estudio del idioma", currentValue: 3*4, targetValue: 5*4, unit: "horas/mes", trackingFrequency: "weekly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Idioma", "Estudio"], assignees: [placeholderAssignee('user6')], subTasks: { completed: 0, total: 0 } },
           { id: generateId(), title: "Completar 2 niveles de una app de idiomas", currentValue: 0, targetValue: 2, unit: "niveles", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentQuarterISO(), tags: ["App", "Progreso"], assignees: [placeholderAssignee('user6')], subTasks: { completed: 0, total: 0 } },
@@ -177,8 +179,8 @@ const exampleLifeOkrs: LifeOkr[] = [
             id: generateId(),
             title: "Contribuir a la Comunidad Local",
             description: "Participar en iniciativas que mejoren el entorno.",
-            level: "Personal", // Can be Individual if part of a CSR program
-            icon: "Award", // Representing achievement through contribution
+            level: "Personal", 
+            icon: "Award", 
             keyResults: [
                 { id: generateId(), title: "Dedicar 4 horas al mes a voluntariado", currentValue: 2, targetValue: 4, unit: "horas/mes", trackingFrequency: "monthly", lastUpdated: getCurrentISODate(), targetDate: getEndOfCurrentMonthISO(), tags: ["Voluntariado"], assignees: [placeholderAssignee('user8')], subTasks: { completed: 0, total: 0 }},
             ]
@@ -195,6 +197,9 @@ export default function OkrTrackerPage() {
   const [isClient, setIsClient] = useState(false);
   const [lifeOkrToDelete, setLifeOkrToDelete] = useState<string | null>(null);
   const [summaryStats, setSummaryStats] = useState<SummaryCardData[]>([]);
+  const [tasksToday, setTasksToday] = useState<KeyResult[]>([]);
+  const [tasksTomorrow, setTasksTomorrow] = useState<KeyResult[]>([]);
+  const [tasksDayAfterTomorrow, setTasksDayAfterTomorrow] = useState<KeyResult[]>([]);
 
   const { toast } = useToast();
 
@@ -231,8 +236,16 @@ export default function OkrTrackerPage() {
       let krsWithProgress = 0;
       let earliestTargetDate: Date | null = null;
       let krsDueSoonCount = 0;
-      const today = startOfDay(new Date());
-      const sevenDaysFromNow = addDays(today, 7);
+      
+      const todayDt = startOfDay(new Date());
+      const tomorrowDt = startOfDay(addDays(todayDt, 1));
+      const dayAfterTomorrowDt = startOfDay(addDays(todayDt, 2));
+      const sevenDaysFromNow = addDays(todayDt, 7);
+
+      const krsToday: KeyResult[] = [];
+      const krsTomorrow: KeyResult[] = [];
+      const krsDayAfterTomorrow: KeyResult[] = [];
+
 
       lifeOkrs.forEach(lifeOkr => {
         lifeOkr.areaOkrs.forEach(areaOkr => {
@@ -248,28 +261,45 @@ export default function OkrTrackerPage() {
             } else if (cappedProgress < 40) {
               atRiskKRs++;
             }
-            // For overall average, use capped progress
+            
             totalProgressSum += cappedProgress;
-            if (kr.targetValue > 0 || kr.currentValue > 0) { // Count KR if it has a target or some progress
+            if (kr.targetValue > 0 || kr.currentValue > 0) { 
                  krsWithProgress++;
             }
 
+            const krWithContext: KeyResult = {
+              ...kr,
+              parentAreaOkrTitle: areaOkr.title,
+              parentLifeOkrTitle: lifeOkr.title,
+            };
 
-            if (kr.targetDate) {
+
+            if (kr.targetDate && cappedProgress < 100) { // Only consider incomplete KRs for task lists and deadlines
               const krDate = startOfDay(new Date(kr.targetDate));
               if (!earliestTargetDate || krDate < earliestTargetDate) {
                 earliestTargetDate = krDate;
               }
-              if (cappedProgress < 100 && isWithinInterval(krDate, { start: today, end: sevenDaysFromNow })) {
+              if (isWithinInterval(krDate, { start: todayDt, end: sevenDaysFromNow })) {
                 krsDueSoonCount++;
+              }
+              if (isSameDay(krDate, todayDt)) {
+                krsToday.push(krWithContext);
+              } else if (isSameDay(krDate, tomorrowDt)) {
+                krsTomorrow.push(krWithContext);
+              } else if (isSameDay(krDate, dayAfterTomorrowDt)) {
+                krsDayAfterTomorrow.push(krWithContext);
               }
             }
           });
         });
       });
+      
+      setTasksToday(krsToday);
+      setTasksTomorrow(krsTomorrow);
+      setTasksDayAfterTomorrow(krsDayAfterTomorrow);
 
       const overallAvgProgress = krsWithProgress > 0 ? totalProgressSum / krsWithProgress : 0;
-      const daysLeftToNextDeadline = earliestTargetDate ? differenceInDays(earliestTargetDate, today) : null;
+      const daysLeftToNextDeadline = earliestTargetDate ? differenceInDays(earliestTargetDate, todayDt) : null;
       
       const activeLifeOkrsCount = lifeOkrs.length;
       const activeAreaOkrsCount = lifeOkrs.reduce((acc, lo) => acc + lo.areaOkrs.length, 0);
@@ -345,7 +375,10 @@ export default function OkrTrackerPage() {
 
     } else if (isClient && lifeOkrs.length === 0) {
       localStorage.removeItem('okrLifeOkrs');
-       setSummaryStats([
+      setTasksToday([]);
+      setTasksTomorrow([]);
+      setTasksDayAfterTomorrow([]);
+      setSummaryStats([
         { id: 's1', title: 'Overall Progress', type: 'circular-progress', progressValue: 0, progressPercent: 0, progressUnit: '%', progressVariant: 'default', cardVariant: 'primary' },
         { id: 's2', title: 'Objectives Overview', type: 'detailed-list', items: [
             { id: 'loCountEmpty', label: 'Life OKRs Active', value: 0, icon: 'Heart', variant: 'muted'},
@@ -449,7 +482,6 @@ export default function OkrTrackerPage() {
   };
   
   const handleEditLifeOkr = (lifeOkr: LifeOkr) => {
-    // This will be implemented later. For now, this function is passed to OkrCard.
     toast({ title: "Edit Action (Placeholder)", description: `Editing Life OKR: ${lifeOkr.title} (not fully implemented yet)`});
   };
 
@@ -474,8 +506,14 @@ export default function OkrTrackerPage() {
       <AppHeader />
       <main className="flex-grow container mx-auto px-2 sm:px-4 py-8">
         <OkrOverallSummary summaryData={summaryStats} />
+
+        <TaskColumns 
+          tasksToday={tasksToday}
+          tasksTomorrow={tasksTomorrow}
+          tasksDayAfterTomorrow={tasksDayAfterTomorrow}
+        />
         
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 mt-8">
           <h1 className="text-2xl font-semibold text-foreground">My Life OKRs</h1>
           <Button onClick={() => setIsAddOkrDialogOpen(true)} size="lg">
             <PlusCircle className="mr-2 h-5 w-5" /> Add Life OKR
@@ -492,7 +530,7 @@ export default function OkrTrackerPage() {
         <AddOkrDialog
           isOpen={isAddOkrDialogOpen}
           onOpenChange={setIsAddOkrDialogOpen}
-          onAddObjective={handleAddLifeOkr} // Prop name kept for compatibility, but handles LifeOkrFormData
+          onAddObjective={handleAddLifeOkr} 
           isLoading={isLoading}
         />
 

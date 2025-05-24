@@ -39,6 +39,9 @@ export interface KeyResult { // Represents a Habit OKR
     total: number;
   };
   assignees?: string[];
+  // Added to provide context when KRs are displayed outside their parent OKRs
+  parentAreaOkrTitle?: string; 
+  parentLifeOkrTitle?: string;
 }
 
 export type AreaOkrLevel = 'Company' | 'Team' | 'Individual' | 'Personal';
