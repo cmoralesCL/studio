@@ -65,13 +65,16 @@ export function AreaOkrItem({ areaOkr, lifeOkrId, onUpdateKeyResult, iconMap, on
                 </span>
                 <Progress value={overallProgress} className="w-20 h-1.5" indicatorClassName={progressColorClass} />
                 <Button
+                  asChild // Add asChild prop here
                   variant="ghost"
                   size="icon"
                   onClick={(e) => { e.stopPropagation(); onEditAreaOkr(areaOkr, lifeOkrId); }}
                   aria-label="Edit Area OKR"
                   className="h-6 w-6 text-muted-foreground hover:text-foreground"
                 >
-                  <Edit className="h-3.5 w-3.5" />
+                  <div> {/* Wrap the icon in a div or span */}
+                    <Edit className="h-3.5 w-3.5" />
+                  </div>
                 </Button>
               </div>
             </div>
